@@ -1,0 +1,6 @@
+name: Dynmap-Towny
+main: org.dynmap.towny.DynmapTownyPlugin
+version: "${project.version}"
+author: mikeprimm
+depend: [ dynmap, Towny ]
+
