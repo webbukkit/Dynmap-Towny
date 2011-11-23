@@ -419,14 +419,14 @@ public class DynmapTownyPlugin extends JavaPlugin {
                     double xx = townblocksize*blk.getX() + (townblocksize/2);
                     double zz = townblocksize*blk.getZ() + (townblocksize/2);
                     if(home == null) {
-                        home = set.createMarker(markid, name, blk.getWorld().getName(), 
+                        home = set.createMarker(markid, name + " [home]", blk.getWorld().getName(), 
                             xx, 64, zz, ico, false);
                         if(home == null)
                             return;
                     }
                     else {
                         home.setLocation(blk.getWorld().getName(), xx, 64, zz);
-                        home.setLabel(name);   /* Update label */
+                        home.setLabel(name + " [home]");   /* Update label */
                         home.setMarkerIcon(ico);
                     }
                     home.setDescription(desc); /* Set popup */
