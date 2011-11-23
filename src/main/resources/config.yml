@@ -11,9 +11,6 @@ layer:
   # ordering priority in layer menu (low goes before high - default is 0)
   layerprio: 2
 
-# Set true to show 3D volumes for zones  
-use3dregions: false
-
 # Format for popup - substitute values for macros
 infowindow: '<div class="infowindow"><span style="font-size:120%;">%regionname% (%nation%)</span><br /> Mayor <span style="font-weight:bold;">%playerowners%</span><br /> Associates <span style="font-weight:bold;">%playermanagers%</span><br/>Flags<br /><span style="font-weight:bold;">%flags%</span></div>'
 
@@ -27,21 +24,16 @@ regionstyle:
   capitalicon: "king"
   
 # Optional setting to limit which regions to show, by name - if commented out, all regions are shown
-#visibleregions:
-#  - homebase
-#  - miningsite
-#  - area.subzone1
+visibleregions: []
   
 # Optional setting to hide specific regions, by name
-#hiddenregions:
-#  - hiddenplace
-#  - secretsite
+hiddenregions: []
   
 # Optional per-region overrides for regionstyle (any defined replace those in regionstyle)
-#customstyle:
-#  homebase:
-#    strokeColor: "#00FF00"
-#  homebase.sub1:
-#    strokeColor: "#007F00"
+custstyle:
+  customregion1:
+    strokeColor: "#00FF00"
+  customregion2.subzone3:
+    strokeColor: "#007F00"
   
 
