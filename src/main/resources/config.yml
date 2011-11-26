@@ -35,5 +35,12 @@ custstyle:
     strokeColor: "#00FF00"
   customregion2.subzone3:
     strokeColor: "#007F00"
-  
 
+# Optional per-nation overrides (custstyle has priority over nationstyle),  _none_ is used for towns with no nation
+nationstyle:  
+  NationOfBlue:
+    strokeColor: "#0000FF"
+    fillColor: "#0000FF"
+  _none_:
+    homeicon: "greenflag"
+    

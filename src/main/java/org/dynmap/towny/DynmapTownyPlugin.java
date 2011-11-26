@@ -38,6 +38,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
     private static final Logger log = Logger.getLogger("Minecraft");
     private static final String LOG_PREFIX = "[Dynmap-Towny] ";
     private static final String DEF_INFOWINDOW = "<div class=\"infowindow\"><span style=\"font-size:120%;\">%regionname% (%nation%)</span><br /> Mayor <span style=\"font-weight:bold;\">%playerowners%</span><br /> Associates <span style=\"font-weight:bold;\">%playermanagers%</span><br/>Flags<br /><span style=\"font-weight:bold;\">%flags%</span></div>";
+    private static final String NATION_NONE = "_none_";
     Plugin dynmap;
     DynmapAPI api;
     MarkerAPI markerapi;
@@ -52,51 +53,39 @@ public class DynmapTownyPlugin extends JavaPlugin {
     String infowindow;
     AreaStyle defstyle;
     Map<String, AreaStyle> cusstyle;
+    Map<String, AreaStyle> nationstyle;
     Set<String> visible;
     Set<String> hidden;
     boolean stop;
     
-    private class AreaStyle {
-        String strokecolor;
+    private static class AreaStyle {
+        int strokecolor;
         double strokeopacity;
         int strokeweight;
-        String fillcolor;
+        int fillcolor;
         double fillopacity;
         String homemarker;
         String capitalmarker;
         MarkerIcon homeicon;
         MarkerIcon capitalicon;
 
-        AreaStyle(FileConfiguration cfg, String path, AreaStyle def) {
-            strokecolor = cfg.getString(path+".strokeColor", def.strokecolor);
-            strokeopacity = cfg.getDouble(path+".strokeOpacity", def.strokeopacity);
-            strokeweight = cfg.getInt(path+".strokeWeight", def.strokeweight);
-            fillcolor = cfg.getString(path+".fillColor", def.fillcolor);
-            fillopacity = cfg.getDouble(path+".fillOpacity", def.fillopacity);
-            homemarker = cfg.getString(path+".homeicon", def.homemarker);
-            if(homemarker != null) {
-                homeicon = markerapi.getMarkerIcon(homemarker);
-                if(homeicon == null) {
-                    severe("Invalid homeicon: " + homemarker);
-                    homeicon = markerapi.getMarkerIcon("blueicon");
-                }
+        AreaStyle(FileConfiguration cfg, String path, MarkerAPI markerapi) {
+            String sc = cfg.getString(path+".strokeColor", null);
+            strokeopacity = cfg.getDouble(path+".strokeOpacity", -1);
+            strokeweight = cfg.getInt(path+".strokeWeight", -1);
+            String fc = cfg.getString(path+".fillColor", null);
+            
+            strokecolor = -1;
+            fillcolor = -1;
+            try {
+            	if(sc != null)
+            		strokecolor = Integer.parseInt(sc.substring(1), 16);
+            	if(fc != null)
+            		fillcolor = Integer.parseInt(fc.substring(1), 16);
+            } catch (NumberFormatException nfx) {
             }
-            capitalmarker = cfg.getString(path+".capitalicon", def.capitalmarker);
-            if(capitalmarker != null) {
-                capitalicon = markerapi.getMarkerIcon(capitalmarker);
-                if(capitalicon == null) {
-                    severe("Invalid capitalicon: " + capitalmarker);
-                    capitalicon = markerapi.getMarkerIcon("king");
-                }
-            }
-        }
 
-        AreaStyle(FileConfiguration cfg, String path) {
-            strokecolor = cfg.getString(path+".strokeColor", "#FF0000");
-            strokeopacity = cfg.getDouble(path+".strokeOpacity", 0.8);
-            strokeweight = cfg.getInt(path+".strokeWeight", 3);
-            fillcolor = cfg.getString(path+".fillColor", "#FF0000");
-            fillopacity = cfg.getDouble(path+".fillOpacity", 0.35);
+            fillopacity = cfg.getDouble(path+".fillOpacity", -1);
             homemarker = cfg.getString(path+".homeicon", null);
             if(homemarker != null) {
                 homeicon = markerapi.getMarkerIcon(homemarker);
@@ -113,6 +102,75 @@ public class DynmapTownyPlugin extends JavaPlugin {
                     capitalicon = markerapi.getMarkerIcon("king");
                 }
             }
+        }
+        
+        public int getStrokeColor(AreaStyle cust, AreaStyle nat) {
+        	if((cust != null) && (cust.strokecolor >= 0))
+        		return cust.strokecolor;
+        	else if((nat != null) && (nat.strokecolor >= 0))
+        		return nat.strokecolor;
+        	else if(strokecolor >= 0)
+        		return strokecolor;
+        	else
+        		return 0xFF0000;
+        }
+        public double getStrokeOpacity(AreaStyle cust, AreaStyle nat) {
+        	if((cust != null) && (cust.strokeopacity >= 0))
+        		return cust.strokeopacity;
+        	else if((nat != null) && (nat.strokeopacity >= 0))
+        		return nat.strokeopacity;
+        	else if(strokeopacity >= 0)
+        		return strokeopacity;
+        	else
+        		return 0.8;
+        }
+        public int getStrokeWeight(AreaStyle cust, AreaStyle nat) {
+        	if((cust != null) && (cust.strokeweight >= 0))
+        		return cust.strokeweight;
+        	else if((nat != null) && (nat.strokeweight >= 0))
+        		return nat.strokeweight;
+        	else if(strokeweight >= 0)
+        		return strokeweight;
+        	else
+        		return 3;
+        }
+        public int getFillColor(AreaStyle cust, AreaStyle nat) {
+        	if((cust != null) && (cust.fillcolor >= 0))
+        		return cust.fillcolor;
+        	else if((nat != null) && (nat.fillcolor >= 0))
+        		return nat.fillcolor;
+        	else if(fillcolor >= 0)
+        		return fillcolor;
+        	else
+        		return 0xFF0000;
+        }
+        public double getFillOpacity(AreaStyle cust, AreaStyle nat) {
+        	if((cust != null) && (cust.fillopacity >= 0))
+        		return cust.fillopacity;
+        	else if((nat != null) && (nat.fillopacity >= 0))
+        		return nat.fillopacity;
+        	else if(fillopacity >= 0)
+        		return fillopacity;
+        	else
+        		return 0.35;
+        }
+        public MarkerIcon getHomeMarker(AreaStyle cust, AreaStyle nat) {
+        	if((cust != null) && (cust.homeicon != null))
+        		return cust.homeicon;
+        	else if((nat != null) && (nat.homeicon != null))
+        		return nat.homeicon;
+        	else
+        		return homeicon;
+        }
+        public MarkerIcon getCapitalMarker(AreaStyle cust, AreaStyle nat) {
+        	if((cust != null) && (cust.capitalicon != null))
+        		return cust.capitalicon;
+        	else if((nat != null) && (nat.capitalicon != null))
+        		return nat.capitalicon;
+        	else if(capitalicon != null)
+        		return capitalicon;
+        	else
+        		return getHomeMarker(cust, nat);
         }
     }
     
@@ -182,31 +240,28 @@ public class DynmapTownyPlugin extends JavaPlugin {
         return true;
     }
     
-    private void addStyle(String resid, AreaMarker m) {
-        AreaStyle as = cusstyle.get(resid);
-        if(as == null)
-            as = defstyle;
-        int sc = 0xFF0000;
-        int fc = 0xFF0000;
-        try {
-            sc = Integer.parseInt(as.strokecolor.substring(1), 16);
-            fc = Integer.parseInt(as.fillcolor.substring(1), 16);
-        } catch (NumberFormatException nfx) {
-        }
-        m.setLineStyle(as.strokeweight, as.strokeopacity, sc);
-        m.setFillStyle(as.fillopacity, fc);
+    private void addStyle(String resid, String natid, AreaMarker m) {
+        AreaStyle as = cusstyle.get(resid);	/* Look up custom style for town, if any */
+        AreaStyle ns = nationstyle.get(natid);	/* Look up nation style, if any */
+        
+        m.setLineStyle(defstyle.getStrokeWeight(as, ns), defstyle.getStrokeOpacity(as, ns), defstyle.getStrokeColor(as, ns));
+        m.setFillStyle(defstyle.getFillOpacity(as, ns), defstyle.getFillColor(as, ns));
     }
     
     private MarkerIcon getMarkerIcon(Town town) {
         String id = town.getName();
         AreaStyle as = cusstyle.get(id);
-        if(as == null) {
-            as = defstyle;
-        }
-        if(town.isCapital() && (as.capitalicon != null))
-            return as.capitalicon;
+        String natid = NATION_NONE;
+        try {
+        	if(town.getNation() != null)
+        		natid = town.getNation().getName();
+        } catch (Exception ex) {}
+        AreaStyle ns = nationstyle.get(natid);
+        
+        if(town.isCapital())
+            return defstyle.getCapitalMarker(as, ns);
         else
-            return as.homeicon;
+            return defstyle.getHomeMarker(as, ns);
     }
  
     enum direction { XPLUS, ZPLUS, XMINUS, ZMINUS };
@@ -397,7 +452,12 @@ public class DynmapTownyPlugin extends JavaPlugin {
                     m.setDescription(desc); /* Set popup */
                 
                     /* Set line and fill properties */
-                    addStyle(town.getName(), m);
+                    String nation = NATION_NONE;
+                    try {
+                    	if(town.getNation() != null)
+                    		nation = town.getNation().getName();
+                    } catch (Exception ex) {}
+                    addStyle(town.getName(), nation, m);
     
                     /* Add to map */
                     newmap.put(polyid, m);
@@ -524,14 +584,23 @@ public class DynmapTownyPlugin extends JavaPlugin {
         infowindow = cfg.getString("infowindow", DEF_INFOWINDOW);
 
         /* Get style information */
-        defstyle = new AreaStyle(cfg, "regionstyle");
+        defstyle = new AreaStyle(cfg, "regionstyle", markerapi);
         cusstyle = new HashMap<String, AreaStyle>();
+        nationstyle = new HashMap<String, AreaStyle>();
         ConfigurationSection sect = cfg.getConfigurationSection("custstyle");
         if(sect != null) {
             Set<String> ids = sect.getKeys(false);
             
             for(String id : ids) {
-                cusstyle.put(id, new AreaStyle(cfg, "custstyle." + id, defstyle));
+                cusstyle.put(id, new AreaStyle(cfg, "custstyle." + id, markerapi));
+            }
+        }
+        sect = cfg.getConfigurationSection("nationstyle");
+        if(sect != null) {
+            Set<String> ids = sect.getKeys(false);
+            
+            for(String id : ids) {
+                nationstyle.put(id, new AreaStyle(cfg, "nationstyle." + id, markerapi));
             }
         }
         List vis = cfg.getList("visibleregions");
