@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dynmap</groupId>
   <artifactId>Dynmap-Towny</artifactId>
-  <version>0.11</version>
+  <version>0.12</version>
   
     <build>
   	  <resources>
@@ -73,4 +73,7 @@
   		<systemPath>${project.basedir}/Towny.jar</systemPath>
   	</dependency>
   </dependencies>
+  <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 </project>
