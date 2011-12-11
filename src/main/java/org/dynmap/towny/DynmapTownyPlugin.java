@@ -1,5 +1,6 @@
 package org.dynmap.towny;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -271,14 +272,26 @@ public class DynmapTownyPlugin extends JavaPlugin {
      */
     private int floodFillTarget(TileFlags src, TileFlags dest, int x, int y) {
         int cnt = 0;
-        if(src.getFlag(x, y)) { /* Set in src */
-            src.setFlag(x, y, false);   /* Clear source */
-            dest.setFlag(x, y, true);   /* Set in destination */
-            cnt++;
-            cnt += floodFillTarget(src, dest, x+1, y); /* Fill adjacent blocks */
-            cnt += floodFillTarget(src, dest, x-1, y);
-            cnt += floodFillTarget(src, dest, x, y+1);
-            cnt += floodFillTarget(src, dest, x, y-1);
+        ArrayDeque<int[]> stack = new ArrayDeque<int[]>();
+        stack.push(new int[] { x, y });
+        
+        while(stack.isEmpty() == false) {
+            int[] nxt = stack.pop();
+            x = nxt[0];
+            y = nxt[1];
+            if(src.getFlag(x, y)) { /* Set in src */
+                src.setFlag(x, y, false);   /* Clear source */
+                dest.setFlag(x, y, true);   /* Set in destination */
+                cnt++;
+                if(src.getFlag(x+1, y))
+                    stack.push(new int[] { x+1, y });
+                if(src.getFlag(x-1, y))
+                    stack.push(new int[] { x-1, y });
+                if(src.getFlag(x, y+1))
+                    stack.push(new int[] { x, y+1 });
+                if(src.getFlag(x, y-1))
+                    stack.push(new int[] { x, y-1 });
+            }
         }
         return cnt;
     }

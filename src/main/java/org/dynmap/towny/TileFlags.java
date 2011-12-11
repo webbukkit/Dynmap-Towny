@@ -1,6 +1,7 @@
 package org.dynmap.towny;
 
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * scalable flags primitive - used for keeping track of potentially huge number of tiles
@@ -12,7 +13,7 @@ import java.util.HashMap;
  */
 public class TileFlags {
 	private HashMap<Long, long[]> chunkmap = new HashMap<Long, long[]>(); 
-	private long last_key = Long.MIN_VALUE;
+	private long last_key = Long.MAX_VALUE;
 	private long[] last_row;
 	
 	public TileFlags() {
@@ -62,6 +63,6 @@ public class TileFlags {
 	public void clear() {
 		chunkmap.clear();
 		last_row = null;
-		last_key = Long.MIN_VALUE;
+		last_key = Long.MAX_VALUE;
 	}
 }
