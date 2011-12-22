@@ -586,11 +586,18 @@ public class DynmapTownyPlugin extends JavaPlugin {
         this.saveConfig();  /* Save updates, if needed */
         
         /* Now, add marker set for mobs (make it transient) */
-        set = markerapi.createMarkerSet("towny.markerset", cfg.getString("layer.name", "Towny"), null, false);
+        set = markerapi.getMarkerSet("towny.markerset");
+        if(set == null)
+            set = markerapi.createMarkerSet("towny.markerset", cfg.getString("layer.name", "Towny"), null, false);
+        else
+            set.setMarkerSetLabel(cfg.getString("layer.name", "Towny"));
         if(set == null) {
             severe("Error creating marker set");
             return;
         }
+        int minzoom = cfg.getInt("layer.minzoom", 0);
+        if(minzoom > 0)
+            set.setMinZoom(minzoom);
         set.setLayerPriority(cfg.getInt("layer.layerprio", 10));
         set.setHideByDefault(cfg.getBoolean("layer.hidebydefault", false));
         use3d = cfg.getBoolean("use3dregions", false);

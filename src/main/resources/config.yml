@@ -10,6 +10,8 @@ layer:
   hidebydefault: false
   # ordering priority in layer menu (low goes before high - default is 0)
   layerprio: 2
+  # (optional) set minimum zoom level before layer is visible (0 = defalt, always visible)
+  minzoom: 0
 
 # Format for popup - substitute values for macros
 infowindow: '<div class="infowindow"><span style="font-size:120%;">%regionname% (%nation%)</span><br /> Mayor <span style="font-weight:bold;">%playerowners%</span><br /> Associates <span style="font-weight:bold;">%playermanagers%</span><br/>Flags<br /><span style="font-weight:bold;">%flags%</span></div>'
