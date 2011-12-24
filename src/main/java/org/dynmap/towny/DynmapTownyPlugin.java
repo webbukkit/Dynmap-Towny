@@ -228,19 +228,19 @@ public class DynmapTownyPlugin extends JavaPlugin {
         return v;
     }
     
-    private boolean isVisible(String id) {
+    private boolean isVisible(String id, String worldname) {
         if((visible != null) && (visible.size() > 0)) {
-            if(visible.contains(id) == false) {
+            if((visible.contains(id) == false) && (visible.contains("world:" + worldname) == false)) {
                 return false;
             }
         }
         if((hidden != null) && (hidden.size() > 0)) {
-            if(hidden.contains(id))
+            if(hidden.contains(id) || hidden.contains("world:" + worldname))
                 return false;
         }
         return true;
     }
-    
+        
     private void addStyle(String resid, String natid, AreaMarker m) {
         AreaStyle as = cusstyle.get(resid);	/* Look up custom style for town, if any */
         AreaStyle ns = nationstyle.get(natid);	/* Look up nation style, if any */
@@ -307,204 +307,208 @@ public class DynmapTownyPlugin extends JavaPlugin {
         String desc = formatInfoWindow(town);
         
         /* Handle areas */
-        if(isVisible(name)) {
-        	List<TownBlock> blocks = town.getTownBlocks();
-        	if(blocks.isEmpty())
-        	    return;
-        	HashMap<String, TileFlags> blkmaps = new HashMap<String, TileFlags>();
-            LinkedList<TownBlock> nodevals = new LinkedList<TownBlock>();
-            TownyWorld curworld = null;
-            TileFlags curblks = null;
-        	/* Loop through blocks: set flags on blockmaps for worlds */
-        	for(TownBlock b : blocks) {
-        	    if(b.getWorld() != curworld) { /* Not same world */
-        	        String wname = b.getWorld().getName();
-        	        curblks = blkmaps.get(wname);  /* Find existing */
-        	        if(curblks == null) {
-        	            curblks = new TileFlags();
-        	            blkmaps.put(wname, curblks);   /* Add fresh one */
-        	        }
-        	        curworld = b.getWorld();
-        	    }
-        	    curblks.setFlag(b.getX(), b.getZ(), true); /* Set flag for block */
-        	    nodevals.addLast(b);
-        	}
-            /* Loop through until we don't find more areas */
-            while(nodevals != null) {
-                LinkedList<TownBlock> ournodes = null;
-                LinkedList<TownBlock> newlist = null;
-                TileFlags ourblks = null;
-                int minx = Integer.MAX_VALUE;
-                int minz = Integer.MAX_VALUE;
-                for(TownBlock node : nodevals) {
-                    int nodex = node.getX();
-                    int nodez = node.getZ();
-                    if(ourblks == null) {   /* If not started, switch to world for this block first */
-                        if(node.getWorld() != curworld) {
-                            curworld = node.getWorld();
-                            curblks = blkmaps.get(curworld.getName());
-                        }
+    	List<TownBlock> blocks = town.getTownBlocks();
+    	if(blocks.isEmpty())
+    	    return;
+    	HashMap<String, TileFlags> blkmaps = new HashMap<String, TileFlags>();
+        LinkedList<TownBlock> nodevals = new LinkedList<TownBlock>();
+        TownyWorld curworld = null;
+        TileFlags curblks = null;
+        boolean vis = false;
+    	/* Loop through blocks: set flags on blockmaps for worlds */
+    	for(TownBlock b : blocks) {
+    	    if(b.getWorld() != curworld) { /* Not same world */
+    	        String wname = b.getWorld().getName();
+    	        vis = isVisible(name, wname);  /* See if visible */
+    	        if(vis) {  /* Only accumulate for visible areas */
+    	            curblks = blkmaps.get(wname);  /* Find existing */
+    	            if(curblks == null) {
+    	                curblks = new TileFlags();
+    	                blkmaps.put(wname, curblks);   /* Add fresh one */
+    	            }
+    	        }
+    	        curworld = b.getWorld();
+    	    }
+    	    if(vis) {
+    	        curblks.setFlag(b.getX(), b.getZ(), true); /* Set flag for block */
+    	        nodevals.addLast(b);
+    	    }
+    	}
+        /* Loop through until we don't find more areas */
+        while(nodevals != null) {
+            LinkedList<TownBlock> ournodes = null;
+            LinkedList<TownBlock> newlist = null;
+            TileFlags ourblks = null;
+            int minx = Integer.MAX_VALUE;
+            int minz = Integer.MAX_VALUE;
+            for(TownBlock node : nodevals) {
+                int nodex = node.getX();
+                int nodez = node.getZ();
+                if(ourblks == null) {   /* If not started, switch to world for this block first */
+                    if(node.getWorld() != curworld) {
+                        curworld = node.getWorld();
+                        curblks = blkmaps.get(curworld.getName());
                     }
-                    /* If we need to start shape, and this block is not part of one yet */
-                    if((ourblks == null) && curblks.getFlag(nodex, nodez)) {
-                        ourblks = new TileFlags();  /* Create map for shape */
-                        ournodes = new LinkedList<TownBlock>();
-                        floodFillTarget(curblks, ourblks, nodex, nodez);   /* Copy shape */
-                        ournodes.add(node); /* Add it to our node list */
+                }
+                /* If we need to start shape, and this block is not part of one yet */
+                if((ourblks == null) && curblks.getFlag(nodex, nodez)) {
+                    ourblks = new TileFlags();  /* Create map for shape */
+                    ournodes = new LinkedList<TownBlock>();
+                    floodFillTarget(curblks, ourblks, nodex, nodez);   /* Copy shape */
+                    ournodes.add(node); /* Add it to our node list */
+                    minx = nodex; minz = nodez;
+                }
+                /* If shape found, and we're in it, add to our node list */
+                else if((ourblks != null) && (node.getWorld() == curworld) &&
+                    (ourblks.getFlag(nodex, nodez))) {
+                    ournodes.add(node);
+                    if(nodex < minx) {
                         minx = nodex; minz = nodez;
                     }
-                    /* If shape found, and we're in it, add to our node list */
-                    else if((ourblks != null) && (node.getWorld() == curworld) &&
-                        (ourblks.getFlag(nodex, nodez))) {
-                        ournodes.add(node);
-                        if(nodex < minx) {
-                            minx = nodex; minz = nodez;
-                        }
-                        else if((nodex == minx) && (nodez < minz)) {
-                            minz = nodez;
-                        }
-                    }
-                    else {  /* Else, keep it in the list for the next polygon */
-                        if(newlist == null) newlist = new LinkedList<TownBlock>();
-                        newlist.add(node);
+                    else if((nodex == minx) && (nodez < minz)) {
+                        minz = nodez;
                     }
                 }
-                nodevals = newlist; /* Replace list (null if no more to process) */
-                if(ourblks != null) {
-                    /* Trace outline of blocks - start from minx, minz going to x+ */
-                    int init_x = minx;
-                    int init_z = minz;
-                    int cur_x = minx;
-                    int cur_z = minz;
-                    direction dir = direction.XPLUS;
-                    ArrayList<int[]> linelist = new ArrayList<int[]>();
-                    linelist.add(new int[] { init_x, init_z } ); // Add start point
-                    while((cur_x != init_x) || (cur_z != init_z) || (dir != direction.ZMINUS)) {
-                        switch(dir) {
-                            case XPLUS: /* Segment in X+ direction */
-                                if(!ourblks.getFlag(cur_x+1, cur_z)) { /* Right turn? */
-                                    linelist.add(new int[] { cur_x+1, cur_z }); /* Finish line */
-                                    dir = direction.ZPLUS;  /* Change direction */
-                                }
-                                else if(!ourblks.getFlag(cur_x+1, cur_z-1)) {  /* Straight? */
-                                    cur_x++;
-                                }
-                                else {  /* Left turn */
-                                    linelist.add(new int[] { cur_x+1, cur_z }); /* Finish line */
-                                    dir = direction.ZMINUS;
-                                    cur_x++; cur_z--;
-                                }
-                                break;
-                            case ZPLUS: /* Segment in Z+ direction */
-                                if(!ourblks.getFlag(cur_x, cur_z+1)) { /* Right turn? */
-                                    linelist.add(new int[] { cur_x+1, cur_z+1 }); /* Finish line */
-                                    dir = direction.XMINUS;  /* Change direction */
-                                }
-                                else if(!ourblks.getFlag(cur_x+1, cur_z+1)) {  /* Straight? */
-                                    cur_z++;
-                                }
-                                else {  /* Left turn */
-                                    linelist.add(new int[] { cur_x+1, cur_z+1 }); /* Finish line */
-                                    dir = direction.XPLUS;
-                                    cur_x++; cur_z++;
-                                }
-                                break;
-                            case XMINUS: /* Segment in X- direction */
-                                if(!ourblks.getFlag(cur_x-1, cur_z)) { /* Right turn? */
-                                    linelist.add(new int[] { cur_x, cur_z+1 }); /* Finish line */
-                                    dir = direction.ZMINUS;  /* Change direction */
-                                }
-                                else if(!ourblks.getFlag(cur_x-1, cur_z+1)) {  /* Straight? */
-                                    cur_x--;
-                                }
-                                else {  /* Left turn */
-                                    linelist.add(new int[] { cur_x, cur_z+1 }); /* Finish line */
-                                    dir = direction.ZPLUS;
-                                    cur_x--; cur_z++;
-                                }
-                                break;
-                            case ZMINUS: /* Segment in Z- direction */
-                                if(!ourblks.getFlag(cur_x, cur_z-1)) { /* Right turn? */
-                                    linelist.add(new int[] { cur_x, cur_z }); /* Finish line */
-                                    dir = direction.XPLUS;  /* Change direction */
-                                }
-                                else if(!ourblks.getFlag(cur_x-1, cur_z-1)) {  /* Straight? */
-                                    cur_z--;
-                                }
-                                else {  /* Left turn */
-                                    linelist.add(new int[] { cur_x, cur_z }); /* Finish line */
-                                    dir = direction.XMINUS;
-                                    cur_x--; cur_z--;
-                                }
-                                break;
-                        }
+                else {  /* Else, keep it in the list for the next polygon */
+                    if(newlist == null) newlist = new LinkedList<TownBlock>();
+                    newlist.add(node);
+                }
+            }
+            nodevals = newlist; /* Replace list (null if no more to process) */
+            if(ourblks != null) {
+                /* Trace outline of blocks - start from minx, minz going to x+ */
+                int init_x = minx;
+                int init_z = minz;
+                int cur_x = minx;
+                int cur_z = minz;
+                direction dir = direction.XPLUS;
+                ArrayList<int[]> linelist = new ArrayList<int[]>();
+                linelist.add(new int[] { init_x, init_z } ); // Add start point
+                while((cur_x != init_x) || (cur_z != init_z) || (dir != direction.ZMINUS)) {
+                    switch(dir) {
+                        case XPLUS: /* Segment in X+ direction */
+                            if(!ourblks.getFlag(cur_x+1, cur_z)) { /* Right turn? */
+                                linelist.add(new int[] { cur_x+1, cur_z }); /* Finish line */
+                                dir = direction.ZPLUS;  /* Change direction */
+                            }
+                            else if(!ourblks.getFlag(cur_x+1, cur_z-1)) {  /* Straight? */
+                                cur_x++;
+                            }
+                            else {  /* Left turn */
+                                linelist.add(new int[] { cur_x+1, cur_z }); /* Finish line */
+                                dir = direction.ZMINUS;
+                                cur_x++; cur_z--;
+                            }
+                            break;
+                        case ZPLUS: /* Segment in Z+ direction */
+                            if(!ourblks.getFlag(cur_x, cur_z+1)) { /* Right turn? */
+                                linelist.add(new int[] { cur_x+1, cur_z+1 }); /* Finish line */
+                                dir = direction.XMINUS;  /* Change direction */
+                            }
+                            else if(!ourblks.getFlag(cur_x+1, cur_z+1)) {  /* Straight? */
+                                cur_z++;
+                            }
+                            else {  /* Left turn */
+                                linelist.add(new int[] { cur_x+1, cur_z+1 }); /* Finish line */
+                                dir = direction.XPLUS;
+                                cur_x++; cur_z++;
+                            }
+                            break;
+                        case XMINUS: /* Segment in X- direction */
+                            if(!ourblks.getFlag(cur_x-1, cur_z)) { /* Right turn? */
+                                linelist.add(new int[] { cur_x, cur_z+1 }); /* Finish line */
+                                dir = direction.ZMINUS;  /* Change direction */
+                            }
+                            else if(!ourblks.getFlag(cur_x-1, cur_z+1)) {  /* Straight? */
+                                cur_x--;
+                            }
+                            else {  /* Left turn */
+                                linelist.add(new int[] { cur_x, cur_z+1 }); /* Finish line */
+                                dir = direction.ZPLUS;
+                                cur_x--; cur_z++;
+                            }
+                            break;
+                        case ZMINUS: /* Segment in Z- direction */
+                            if(!ourblks.getFlag(cur_x, cur_z-1)) { /* Right turn? */
+                                linelist.add(new int[] { cur_x, cur_z }); /* Finish line */
+                                dir = direction.XPLUS;  /* Change direction */
+                            }
+                            else if(!ourblks.getFlag(cur_x-1, cur_z-1)) {  /* Straight? */
+                                cur_z--;
+                            }
+                            else {  /* Left turn */
+                                linelist.add(new int[] { cur_x, cur_z }); /* Finish line */
+                                dir = direction.XMINUS;
+                                cur_x--; cur_z--;
+                            }
+                            break;
                     }
-                    /* Build information for specific area */
-                    String polyid = town.getName() + "__" + poly_index;
-                    int sz = linelist.size();
-                    x = new double[sz];
-                    z = new double[sz];
-                    for(int i = 0; i < sz; i++) {
-                        int[] line = linelist.get(i);
-                        x[i] = (double)line[0] * (double)townblocksize;
-                        z[i] = (double)line[1] * (double)townblocksize;
-                    }
-                    /* Find existing one */
-                    AreaMarker m = resareas.remove(polyid); /* Existing area? */
+                }
+                /* Build information for specific area */
+                String polyid = town.getName() + "__" + poly_index;
+                int sz = linelist.size();
+                x = new double[sz];
+                z = new double[sz];
+                for(int i = 0; i < sz; i++) {
+                    int[] line = linelist.get(i);
+                    x[i] = (double)line[0] * (double)townblocksize;
+                    z[i] = (double)line[1] * (double)townblocksize;
+                }
+                /* Find existing one */
+                AreaMarker m = resareas.remove(polyid); /* Existing area? */
+                if(m == null) {
+                    m = set.createAreaMarker(polyid, name, false, curworld.getName(), x, z, false);
                     if(m == null) {
-                        m = set.createAreaMarker(polyid, name, false, curworld.getName(), x, z, false);
-                        if(m == null) {
-                            info("error adding area marker " + polyid);
-                            return;
-                        }
+                        info("error adding area marker " + polyid);
+                        return;
                     }
-                    else {
-                        m.setCornerLocations(x, z); /* Replace corner locations */
-                        m.setLabel(name);   /* Update label */
-                    }
-                    m.setDescription(desc); /* Set popup */
-                
-                    /* Set line and fill properties */
-                    String nation = NATION_NONE;
-                    try {
-                    	if(town.getNation() != null)
-                    		nation = town.getNation().getName();
-                    } catch (Exception ex) {}
-                    addStyle(town.getName(), nation, m);
-    
-                    /* Add to map */
-                    newmap.put(polyid, m);
-                    poly_index++;
                 }
-            }
-            /* Now, add marker for home block */
-            TownBlock blk = null;
-            try {
-                blk = town.getHomeBlock();
-            } catch(Exception ex) {
-                severe("getHomeBlock exception " + ex);
-            }
-            if(blk != null) {
-                String markid = town.getName() + "__home";
-                MarkerIcon ico = getMarkerIcon(town);
-                if(ico != null) {
-                    Marker home = resmark.remove(markid);
-                    double xx = townblocksize*blk.getX() + (townblocksize/2);
-                    double zz = townblocksize*blk.getZ() + (townblocksize/2);
-                    if(home == null) {
-                        home = set.createMarker(markid, name + " [home]", blk.getWorld().getName(), 
-                            xx, 64, zz, ico, false);
-                        if(home == null)
-                            return;
-                    }
-                    else {
-                        home.setLocation(blk.getWorld().getName(), xx, 64, zz);
-                        home.setLabel(name + " [home]");   /* Update label */
-                        home.setMarkerIcon(ico);
-                    }
-                    home.setDescription(desc); /* Set popup */
-                    newmark.put(markid, home);
+                else {
+                    m.setCornerLocations(x, z); /* Replace corner locations */
+                    m.setLabel(name);   /* Update label */
                 }
+                m.setDescription(desc); /* Set popup */
+            
+                /* Set line and fill properties */
+                String nation = NATION_NONE;
+                try {
+                	if(town.getNation() != null)
+                		nation = town.getNation().getName();
+                } catch (Exception ex) {}
+                addStyle(town.getName(), nation, m);
+
+                /* Add to map */
+                newmap.put(polyid, m);
+                poly_index++;
+            }
+        }
+        /* Now, add marker for home block */
+        TownBlock blk = null;
+        try {
+            blk = town.getHomeBlock();
+        } catch(Exception ex) {
+            severe("getHomeBlock exception " + ex);
+        }
+        if((blk != null) && isVisible(name, blk.getWorld().getName())) {
+            String markid = town.getName() + "__home";
+            MarkerIcon ico = getMarkerIcon(town);
+            if(ico != null) {
+                Marker home = resmark.remove(markid);
+                double xx = townblocksize*blk.getX() + (townblocksize/2);
+                double zz = townblocksize*blk.getZ() + (townblocksize/2);
+                if(home == null) {
+                    home = set.createMarker(markid, name + " [home]", blk.getWorld().getName(), 
+                        xx, 64, zz, ico, false);
+                    if(home == null)
+                        return;
+                }
+                else {
+                    home.setLocation(blk.getWorld().getName(), xx, 64, zz);
+                    home.setLabel(name + " [home]");   /* Update label */
+                    home.setMarkerIcon(ico);
+                }
+                home.setDescription(desc); /* Set popup */
+                newmark.put(markid, home);
             }
         }
     }
