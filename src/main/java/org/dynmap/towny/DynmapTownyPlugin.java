@@ -194,20 +194,20 @@ public class DynmapTownyPlugin extends JavaPlugin {
     
     private String formatInfoWindow(Town town) {
         String v = "<div class=\"regioninfo\">"+infowindow+"</div>";
-        v = v.replaceAll("%regionname%", town.getName());
-        v = v.replaceAll("%playerowners%", town.hasMayor()?town.getMayor().getName():"");
+        v = v.replace("%regionname%", town.getName());
+        v = v.replace("%playerowners%", town.hasMayor()?town.getMayor().getName():"");
         String res = "";
         for(Resident r : town.getResidents()) {
         	if(res.length()>0) res += ",";
         	res += r.getName();
         }
-        v = v.replaceAll("%playermembers%", res);
+        v = v.replace("%playermembers%", res);
         String mgrs = "";
         for(Resident r : town.getAssistants()) {
             if(mgrs.length()>0) mgrs += ",";
             mgrs += r.getName();
         }
-        v = v.replaceAll("%playermanagers%", res);
+        v = v.replace("%playermanagers%", res);
         
         String nation = "";
 		try {
@@ -215,7 +215,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 				nation = town.getNation().getName();
 		} catch (Exception e) {
 		}
-        v = v.replaceAll("%nation%", nation);
+        v = v.replace("%nation%", nation);
         /* Build flags */
         String flgs = "hasUpkeep: " + town.hasUpkeep();
         flgs += "<br/>pvp: " + town.isPVP();
@@ -224,7 +224,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         flgs += "<br/>explosion: " + town.isBANG();
         flgs += "<br/>fire: " + town.isFire();
         flgs += "<br/>capital: " + town.isCapital();
-        v = v.replaceAll("%flags%", flgs);
+        v = v.replace("%flags%", flgs);
         return v;
     }
     
