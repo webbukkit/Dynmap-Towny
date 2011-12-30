@@ -69,12 +69,14 @@ public class DynmapTownyPlugin extends JavaPlugin {
         String capitalmarker;
         MarkerIcon homeicon;
         MarkerIcon capitalicon;
+        int yc;
 
         AreaStyle(FileConfiguration cfg, String path, MarkerAPI markerapi) {
             String sc = cfg.getString(path+".strokeColor", null);
             strokeopacity = cfg.getDouble(path+".strokeOpacity", -1);
             strokeweight = cfg.getInt(path+".strokeWeight", -1);
             String fc = cfg.getString(path+".fillColor", null);
+            yc = cfg.getInt(path+".y", -1);
             
             strokecolor = -1;
             fillcolor = -1;
@@ -173,6 +175,16 @@ public class DynmapTownyPlugin extends JavaPlugin {
         	else
         		return getHomeMarker(cust, nat);
         }
+        public int getY(AreaStyle cust, AreaStyle nat) {
+            if((cust != null) && (cust.yc >= 0))
+                return cust.yc;
+            else if((nat != null) && (nat.yc >= 0))
+                return nat.yc;
+            else if(yc >= 0)
+                return yc;
+            else
+                return 64;
+        }
     }
     
     public static void info(String msg) {
@@ -198,13 +210,13 @@ public class DynmapTownyPlugin extends JavaPlugin {
         v = v.replace("%playerowners%", town.hasMayor()?town.getMayor().getName():"");
         String res = "";
         for(Resident r : town.getResidents()) {
-        	if(res.length()>0) res += ",";
+        	if(res.length()>0) res += ", ";
         	res += r.getName();
         }
         v = v.replace("%playermembers%", res);
         String mgrs = "";
         for(Resident r : town.getAssistants()) {
-            if(mgrs.length()>0) mgrs += ",";
+            if(mgrs.length()>0) mgrs += ", ";
             mgrs += r.getName();
         }
         v = v.replace("%playermanagers%", res);
@@ -247,6 +259,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
         
         m.setLineStyle(defstyle.getStrokeWeight(as, ns), defstyle.getStrokeOpacity(as, ns), defstyle.getStrokeColor(as, ns));
         m.setFillStyle(defstyle.getFillOpacity(as, ns), defstyle.getFillColor(as, ns));
+        double y = defstyle.getY(as, ns);
+        m.setRangeY(y, y);
     }
     
     private MarkerIcon getMarkerIcon(Town town) {

@@ -37,8 +37,10 @@ hiddenregions: []
 custstyle:
   customregion1:
     strokeColor: "#00FF00"
-  customregion2.subzone3:
+    y: 64
+  customregion2:
     strokeColor: "#007F00"
+    y: 64
 
 # Optional per-nation overrides (custstyle has priority over nationstyle),  _none_ is used for towns with no nation
 nationstyle:  
