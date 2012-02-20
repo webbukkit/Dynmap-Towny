@@ -13,10 +13,10 @@ import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.server.ServerListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -533,7 +533,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         Map<String,Marker> newmark = new HashMap<String,Marker>(); /* Build new map */
         
         /* Loop through towns */
-        List<Town> towns = tuniv.getTowns();
+        List<Town> towns = TownyUniverse.getDataSource().getTowns();
         for(Town t : towns) {
     		handleTown(t, newmap, newmark);
         }
@@ -552,8 +552,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
         
     }
     
-    private class OurServerListener extends ServerListener {
-        @Override
+    private class OurServerListener implements Listener {
+        @SuppressWarnings("unused")
+        @EventHandler(priority=EventPriority.MONITOR)
         public void onPluginEnable(PluginEnableEvent event) {
             Plugin p = event.getPlugin();
             String name = p.getDescription().getName();
@@ -581,11 +582,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
             return;
         }
         towny = (Towny)p;
+
+        getServer().getPluginManager().registerEvents(new OurServerListener(), this);        
         /* If both enabled, activate */
         if(dynmap.isEnabled() && towny.isEnabled())
             activate();
-        else
-            getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, new OurServerListener(), Priority.Monitor, this);        
     }
     
     private void activate() {
@@ -641,11 +642,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 nationstyle.put(id, new AreaStyle(cfg, "nationstyle." + id, markerapi));
             }
         }
-        List vis = cfg.getList("visibleregions");
+        List<String> vis = cfg.getStringList("visibleregions");
         if(vis != null) {
             visible = new HashSet<String>(vis);
         }
-        List hid = cfg.getList("hiddenregions");
+        List<String> hid = cfg.getStringList("hiddenregions");
         if(hid != null) {
             hidden = new HashSet<String>(hid);
         }

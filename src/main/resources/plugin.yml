@@ -2,5 +2,5 @@ name: Dynmap-Towny
 main: org.dynmap.towny.DynmapTownyPlugin
 version: "${project.version}"
 author: mikeprimm
-softdepend: [dynmap,Towny]
+depend: [ dynmap, Towny ]
 
