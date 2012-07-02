@@ -12,6 +12,12 @@ layer:
   layerprio: 2
   # (optional) set minimum zoom level before layer is visible (0 = defalt, always visible)
   minzoom: 0
+  # Show shop blocks with their own outline
+  showShops: false
+  # Show arena blocks with their own outline
+  showArenas: false
+  # Show embassy blocks with their own outline
+  showEmbassies: false
 
 # Format for popup - substitute values for macros
 infowindow: '<div class="infowindow"><span style="font-size:120%;">%regionname% (%nation%)</span><br /> Mayor <span style="font-weight:bold;">%playerowners%</span><br /> Associates <span style="font-weight:bold;">%playermanagers%</span><br/>Flags<br /><span style="font-weight:bold;">%flags%</span></div>'
@@ -24,6 +30,9 @@ regionstyle:
   fillOpacity: 0.35
   homeicon: "blueflag"
   capitalicon: "king"
+  fillColorShops: "#00FF00"
+  fillColorArenas: "#FF00FF"
+  fillColorEmbassies: "#00FFFF"
   
 # Optional setting to limit which regions to show, by name - if commented out, all regions are shown
 # To show all regions on a given world, add 'world:<worldname>' to the list

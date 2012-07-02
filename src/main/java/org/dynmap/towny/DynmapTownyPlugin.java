@@ -32,6 +32,7 @@ import com.palmergames.bukkit.towny.object.Coord;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
+import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.object.TownyUniverse;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.palmergames.bukkit.TownyChat.Chat;
@@ -59,6 +60,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
     Map<String, AreaStyle> nationstyle;
     Set<String> visible;
     Set<String> hidden;
+    boolean show_shops;
+    boolean show_arenas;
+    boolean show_embassies;
     boolean stop;
     
     private static class AreaStyle {
@@ -67,6 +71,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
         int strokeweight;
         int fillcolor;
         double fillopacity;
+        int fillcolor_shops;
+        int fillcolor_embassies;
+        int fillcolor_arenas;
         String homemarker;
         String capitalmarker;
         MarkerIcon homeicon;
@@ -78,15 +85,27 @@ public class DynmapTownyPlugin extends JavaPlugin {
             strokeopacity = cfg.getDouble(path+".strokeOpacity", -1);
             strokeweight = cfg.getInt(path+".strokeWeight", -1);
             String fc = cfg.getString(path+".fillColor", null);
+            String fcs = cfg.getString(path+".fillColorShops", null);
+            String fca = cfg.getString(path+".fillColorArenas", null);
+            String fce = cfg.getString(path+".fillColorEmbassies", null);
             yc = cfg.getInt(path+".y", -1);
             
             strokecolor = -1;
             fillcolor = -1;
+            fillcolor_shops = -1;
+            fillcolor_arenas = -1;
+            fillcolor_embassies = -1;
             try {
             	if(sc != null)
             		strokecolor = Integer.parseInt(sc.substring(1), 16);
             	if(fc != null)
             		fillcolor = Integer.parseInt(fc.substring(1), 16);
+                if(fcs != null)
+                    fillcolor_shops = Integer.parseInt(fcs.substring(1), 16);
+                if(fca != null)
+                    fillcolor_arenas = Integer.parseInt(fca.substring(1), 16);
+                if(fce != null)
+                    fillcolor_embassies = Integer.parseInt(fce.substring(1), 16);
             } catch (NumberFormatException nfx) {
             }
 
@@ -139,7 +158,37 @@ public class DynmapTownyPlugin extends JavaPlugin {
         	else
         		return 3;
         }
-        public int getFillColor(AreaStyle cust, AreaStyle nat) {
+        public int getFillColor(AreaStyle cust, AreaStyle nat, TownBlockType btype) {
+            if(btype == TownBlockType.COMMERCIAL) {
+                if((cust != null) && (cust.fillcolor_shops >= 0))
+                    return cust.fillcolor_shops;
+                else if((nat != null) && (nat.fillcolor_shops >= 0))
+                    return nat.fillcolor_shops;
+                else if(fillcolor_shops >= 0)
+                    return fillcolor_shops;
+                else
+                    return 0xFF0000;
+            }
+            else if(btype == TownBlockType.ARENA) {
+                if((cust != null) && (cust.fillcolor_arenas >= 0))
+                    return cust.fillcolor_shops;
+                else if((nat != null) && (nat.fillcolor_arenas >= 0))
+                    return nat.fillcolor_arenas;
+                else if(fillcolor_arenas >= 0)
+                    return fillcolor_arenas;
+                else
+                    return 0xFF0000;
+            }
+            else if(btype == TownBlockType.EMBASSY) {
+                if((cust != null) && (cust.fillcolor_embassies >= 0))
+                    return cust.fillcolor_embassies;
+                else if((nat != null) && (nat.fillcolor_embassies >= 0))
+                    return nat.fillcolor_embassies;
+                else if(fillcolor_embassies >= 0)
+                    return fillcolor_embassies;
+                else
+                    return 0xFF0000;
+            }
         	if((cust != null) && (cust.fillcolor >= 0))
         		return cust.fillcolor;
         	else if((nat != null) && (nat.fillcolor >= 0))
@@ -206,9 +255,12 @@ public class DynmapTownyPlugin extends JavaPlugin {
     private Map<String, AreaMarker> resareas = new HashMap<String, AreaMarker>();
     private Map<String, Marker> resmark = new HashMap<String, Marker>();
     
-    private String formatInfoWindow(Town town) {
+    private String formatInfoWindow(Town town, TownBlockType btype) {
         String v = "<div class=\"regioninfo\">"+infowindow+"</div>";
-        v = v.replace("%regionname%", town.getName());
+        if(btype != null)
+            v = v.replace("%regionname%", town.getName() + "(" + btype.toString() + ")");
+        else
+            v = v.replace("%regionname%", town.getName());
         v = v.replace("%playerowners%", town.hasMayor()?town.getMayor().getName():"");
         String res = "";
         for(Resident r : town.getResidents()) {
@@ -255,12 +307,17 @@ public class DynmapTownyPlugin extends JavaPlugin {
         return true;
     }
         
-    private void addStyle(String resid, String natid, AreaMarker m) {
+    private void addStyle(String resid, String natid, AreaMarker m, TownBlockType btype) {
         AreaStyle as = cusstyle.get(resid);	/* Look up custom style for town, if any */
         AreaStyle ns = nationstyle.get(natid);	/* Look up nation style, if any */
         
-        m.setLineStyle(defstyle.getStrokeWeight(as, ns), defstyle.getStrokeOpacity(as, ns), defstyle.getStrokeColor(as, ns));
-        m.setFillStyle(defstyle.getFillOpacity(as, ns), defstyle.getFillColor(as, ns));
+        if(btype == null) {
+            m.setLineStyle(defstyle.getStrokeWeight(as, ns), defstyle.getStrokeOpacity(as, ns), defstyle.getStrokeColor(as, ns));
+        }
+        else {
+            m.setLineStyle(1, 0, 0);
+        }
+        m.setFillStyle(defstyle.getFillOpacity(as, ns), defstyle.getFillColor(as, ns, btype));
         double y = defstyle.getY(as, ns);
         m.setRangeY(y, y);
     }
@@ -313,19 +370,19 @@ public class DynmapTownyPlugin extends JavaPlugin {
     }
     
     /* Handle specific town */
-    private void handleTown(Town town, Map<String, AreaMarker> newmap, Map<String, Marker> newmark) {
+    private void handleTown(Town town, Map<String, AreaMarker> newmap, Map<String, Marker> newmark, TownBlockType btype) {
         String name = town.getName();
         double[] x = null;
         double[] z = null;
         int poly_index = 0; /* Index of polygon for given town */
-        
-        /* Build popup */
-        String desc = formatInfoWindow(town);
-        
+                
         /* Handle areas */
     	List<TownBlock> blocks = town.getTownBlocks();
     	if(blocks.isEmpty())
     	    return;
+        /* Build popup */
+        String desc = formatInfoWindow(town, btype);
+
     	HashMap<String, TileFlags> blkmaps = new HashMap<String, TileFlags>();
         LinkedList<TownBlock> nodevals = new LinkedList<TownBlock>();
         TownyWorld curworld = null;
@@ -333,6 +390,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
         boolean vis = false;
     	/* Loop through blocks: set flags on blockmaps for worlds */
     	for(TownBlock b : blocks) {
+    	    /* If we're scanning for specific type, and this isn't it, skip */
+    	    if((btype != null) && (b.getType() != btype)) {
+    	        continue;
+    	    }
+    	    info("type=" + b.getType());
     	    if(b.getWorld() != curworld) { /* Not same world */
     	        String wname = b.getWorld().getName();
     	        vis = isVisible(name, wname);  /* See if visible */
@@ -462,6 +524,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 }
                 /* Build information for specific area */
                 String polyid = town.getName() + "__" + poly_index;
+                if(btype != null) {
+                    polyid += "_" + btype;
+                }
                 int sz = linelist.size();
                 x = new double[sz];
                 z = new double[sz];
@@ -491,40 +556,42 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 	if(town.getNation() != null)
                 		nation = town.getNation().getName();
                 } catch (Exception ex) {}
-                addStyle(town.getName(), nation, m);
+                addStyle(town.getName(), nation, m, btype);
 
                 /* Add to map */
                 newmap.put(polyid, m);
                 poly_index++;
             }
         }
-        /* Now, add marker for home block */
-        TownBlock blk = null;
-        try {
-            blk = town.getHomeBlock();
-        } catch(Exception ex) {
-            severe("getHomeBlock exception " + ex);
-        }
-        if((blk != null) && isVisible(name, blk.getWorld().getName())) {
-            String markid = town.getName() + "__home";
-            MarkerIcon ico = getMarkerIcon(town);
-            if(ico != null) {
-                Marker home = resmark.remove(markid);
-                double xx = townblocksize*blk.getX() + (townblocksize/2);
-                double zz = townblocksize*blk.getZ() + (townblocksize/2);
-                if(home == null) {
-                    home = set.createMarker(markid, name + " [home]", blk.getWorld().getName(), 
-                        xx, 64, zz, ico, false);
-                    if(home == null)
-                        return;
+        if(btype == null) {
+            /* Now, add marker for home block */
+            TownBlock blk = null;
+            try {
+                blk = town.getHomeBlock();
+            } catch(Exception ex) {
+                severe("getHomeBlock exception " + ex);
+            }
+            if((blk != null) && isVisible(name, blk.getWorld().getName())) {
+                String markid = town.getName() + "__home";
+                MarkerIcon ico = getMarkerIcon(town);
+                if(ico != null) {
+                    Marker home = resmark.remove(markid);
+                    double xx = townblocksize*blk.getX() + (townblocksize/2);
+                    double zz = townblocksize*blk.getZ() + (townblocksize/2);
+                    if(home == null) {
+                        home = set.createMarker(markid, name + " [home]", blk.getWorld().getName(), 
+                                xx, 64, zz, ico, false);
+                        if(home == null)
+                            return;
+                    }
+                    else {
+                        home.setLocation(blk.getWorld().getName(), xx, 64, zz);
+                        home.setLabel(name + " [home]");   /* Update label */
+                        home.setMarkerIcon(ico);
+                    }
+                    home.setDescription(desc); /* Set popup */
+                    newmark.put(markid, home);
                 }
-                else {
-                    home.setLocation(blk.getWorld().getName(), xx, 64, zz);
-                    home.setLabel(name + " [home]");   /* Update label */
-                    home.setMarkerIcon(ico);
-                }
-                home.setDescription(desc); /* Set popup */
-                newmark.put(markid, home);
             }
         }
     }
@@ -537,7 +604,16 @@ public class DynmapTownyPlugin extends JavaPlugin {
         /* Loop through towns */
         List<Town> towns = TownyUniverse.getDataSource().getTowns();
         for(Town t : towns) {
-    		handleTown(t, newmap, newmark);
+    		handleTown(t, newmap, newmark, null);
+    		if(show_shops) {
+                handleTown(t, newmap, newmark, TownBlockType.COMMERCIAL);
+    		}
+            if(show_arenas) {
+                handleTown(t, newmap, newmark, TownBlockType.ARENA);
+            }
+            if(show_embassies) {
+                handleTown(t, newmap, newmark, TownBlockType.EMBASSY);
+            }
         }
         /* Now, review old map - anything left is gone */
         for(AreaMarker oldm : resareas.values()) {
@@ -643,6 +719,10 @@ public class DynmapTownyPlugin extends JavaPlugin {
         set.setHideByDefault(cfg.getBoolean("layer.hidebydefault", false));
         use3d = cfg.getBoolean("use3dregions", false);
         infowindow = cfg.getString("infowindow", DEF_INFOWINDOW);
+        /* See if we need to show commercial areas */
+        show_shops = cfg.getBoolean("layer.showShops", false);
+        show_arenas = cfg.getBoolean("layer.showArenas", false);
+        show_embassies = cfg.getBoolean("layer.showEmbassies", false);
 
         /* Get style information */
         defstyle = new AreaStyle(cfg, "regionstyle", markerapi);
