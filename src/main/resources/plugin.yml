@@ -3,4 +3,5 @@ main: org.dynmap.towny.DynmapTownyPlugin
 version: "${project.version}"
 author: mikeprimm
 depend: [ dynmap, Towny ]
+softdepend: [ TownyChat ]
 

@@ -34,6 +34,7 @@ import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyUniverse;
 import com.palmergames.bukkit.towny.object.TownyWorld;
+import com.palmergames.bukkit.TownyChat.Chat;
 
 public class DynmapTownyPlugin extends JavaPlugin {
     private static final Logger log = Logger.getLogger("Minecraft");
@@ -46,6 +47,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
     Towny towny;
     TownyUniverse tuniv;
     int townblocksize;
+    Chat townychat;
     
     FileConfiguration cfg;
     MarkerSet set;
@@ -559,8 +561,13 @@ public class DynmapTownyPlugin extends JavaPlugin {
             Plugin p = event.getPlugin();
             String name = p.getDescription().getName();
             if(name.equals("dynmap") || name.equals("Towny")) {
-                if(dynmap.isEnabled() && towny.isEnabled())
+                if(dynmap.isEnabled() && towny.isEnabled()) {
                     activate();
+                    prepForChat();
+                }
+            }
+            else if(name.equals("TownyChat")) {
+                prepForChat();
             }
         }
     }
@@ -582,11 +589,26 @@ public class DynmapTownyPlugin extends JavaPlugin {
             return;
         }
         towny = (Towny)p;
+        
+        p = pm.getPlugin("TownyChat");
+        if(p != null) {
+            townychat = (Chat)p;
+        }
 
         getServer().getPluginManager().registerEvents(new OurServerListener(), this);        
         /* If both enabled, activate */
-        if(dynmap.isEnabled() && towny.isEnabled())
+        if(dynmap.isEnabled() && towny.isEnabled()) {
             activate();
+            prepForChat();
+        }
+    }
+    
+    private void prepForChat() {
+        /* If townychat is active, and we've found dynmap API */
+        if((townychat != null) && townychat.isEnabled() && dynmap.isEnabled()) {
+            api.setDisableChatToWebProcessing(true);
+            info("TownyChat detect: disabling normal chat-to-web processing in Dynmap");
+        }
     }
     
     private void activate() {
