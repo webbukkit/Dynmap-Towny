@@ -63,6 +63,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
     boolean show_shops;
     boolean show_arenas;
     boolean show_embassies;
+    boolean show_wilds;
     boolean stop;
     
     private static class AreaStyle {
@@ -74,6 +75,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         int fillcolor_shops;
         int fillcolor_embassies;
         int fillcolor_arenas;
+        int fillcolor_wilds;
         String homemarker;
         String capitalmarker;
         MarkerIcon homeicon;
@@ -88,6 +90,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             String fcs = cfg.getString(path+".fillColorShops", null);
             String fca = cfg.getString(path+".fillColorArenas", null);
             String fce = cfg.getString(path+".fillColorEmbassies", null);
+            String fcw = cfg.getString(path+".fillColorWilds", null);
             yc = cfg.getInt(path+".y", -1);
             
             strokecolor = -1;
@@ -95,6 +98,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             fillcolor_shops = -1;
             fillcolor_arenas = -1;
             fillcolor_embassies = -1;
+            fillcolor_wilds = -1;
             try {
             	if(sc != null)
             		strokecolor = Integer.parseInt(sc.substring(1), 16);
@@ -106,6 +110,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
                     fillcolor_arenas = Integer.parseInt(fca.substring(1), 16);
                 if(fce != null)
                     fillcolor_embassies = Integer.parseInt(fce.substring(1), 16);
+                if(fcw != null)
+                    fillcolor_wilds = Integer.parseInt(fcw.substring(1), 16);
             } catch (NumberFormatException nfx) {
             }
 
@@ -186,6 +192,16 @@ public class DynmapTownyPlugin extends JavaPlugin {
                     return nat.fillcolor_embassies;
                 else if(fillcolor_embassies >= 0)
                     return fillcolor_embassies;
+                else
+                    return 0xFF0000;
+            }
+            else if(btype == TownBlockType.WILDS) {
+                if((cust != null) && (cust.fillcolor_wilds >= 0))
+                    return cust.fillcolor_wilds;
+                else if((nat != null) && (nat.fillcolor_wilds >= 0))
+                    return nat.fillcolor_wilds;
+                else if(fillcolor_wilds >= 0)
+                    return fillcolor_wilds;
                 else
                     return 0xFF0000;
             }
@@ -394,7 +410,6 @@ public class DynmapTownyPlugin extends JavaPlugin {
     	    if((btype != null) && (b.getType() != btype)) {
     	        continue;
     	    }
-    	    info("type=" + b.getType());
     	    if(b.getWorld() != curworld) { /* Not same world */
     	        String wname = b.getWorld().getName();
     	        vis = isVisible(name, wname);  /* See if visible */
@@ -614,6 +629,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
             if(show_embassies) {
                 handleTown(t, newmap, newmark, TownBlockType.EMBASSY);
             }
+            if(show_wilds) {
+                handleTown(t, newmap, newmark, TownBlockType.WILDS);
+            }
         }
         /* Now, review old map - anything left is gone */
         for(AreaMarker oldm : resareas.values()) {
@@ -723,6 +741,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         show_shops = cfg.getBoolean("layer.showShops", false);
         show_arenas = cfg.getBoolean("layer.showArenas", false);
         show_embassies = cfg.getBoolean("layer.showEmbassies", false);
+        show_wilds = cfg.getBoolean("layer.showWilds", false);
 
         /* Get style information */
         defstyle = new AreaStyle(cfg, "regionstyle", markerapi);
