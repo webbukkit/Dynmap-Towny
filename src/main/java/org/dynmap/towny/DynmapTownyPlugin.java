@@ -26,15 +26,18 @@ import org.dynmap.markers.Marker;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.markers.MarkerIcon;
 import org.dynmap.markers.MarkerSet;
+import org.dynmap.markers.PlayerSet;
 
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Coord;
+import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.object.TownyUniverse;
 import com.palmergames.bukkit.towny.object.TownyWorld;
+
 import com.palmergames.bukkit.TownyChat.Chat;
 
 public class DynmapTownyPlugin extends JavaPlugin {
@@ -49,6 +52,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
     TownyUniverse tuniv;
     int townblocksize;
     Chat townychat;
+    boolean reload = false;
+    private boolean playersbytown;
+    private boolean playersbynation;
     
     FileConfiguration cfg;
     MarkerSet set;
@@ -263,10 +269,122 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
     private class TownyUpdate implements Runnable {
         public void run() {
-            if(!stop)
+            if(!stop) {
                 updateTowns();
+                updateTownPlayerSets();
+                updateNationPlayerSets();
+                getServer().getScheduler().scheduleSyncDelayedTask(DynmapTownyPlugin.this, this, updperiod);
+            }
         }
     }
+
+    /* Update event from towny not being fired.... 
+    private class TownyUpdateReq implements Runnable {
+        public void run() {
+            if(!stop) {
+                pending_upd_req = null;
+                
+                updateTowns();
+            }
+        }
+    }
+    private TownyUpdateReq pending_upd_req = null;
+    private void requestUpdateTownMap(Town t) {
+        info("requestUpdateTownMap("+ t.getTag() + ")");
+        if(pending_upd_req == null) {
+            pending_upd_req = new TownyUpdateReq();
+            getServer().getScheduler().scheduleSyncDelayedTask(this, pending_upd_req, 20);
+        }
+    }
+    */
+    
+    private void updateTown(Town town) {
+        if(!playersbytown) return;
+        Set<String> plids = new HashSet<String>();
+        List<Resident> res = town.getResidents();
+        for(Resident r : res) {
+            plids.add(r.getName());
+        }
+        String setid = "towny.town." + town.getName();
+        PlayerSet set = markerapi.getPlayerSet(setid);  /* See if set exists */
+        if(set == null) {
+            set = markerapi.createPlayerSet(setid, true, plids, false);
+            info("Added player visibility set '" + setid + "' for town " + town.getName());
+        }
+        else {
+            set.setPlayers(plids);
+        }
+    }
+
+    private void updateTownPlayerSets() {
+        if(!playersbytown) return;
+        Map<String,Town> towns = tuniv.getTownsMap();
+        for(Town t : towns.values()) {
+            updateTown(t);
+        }
+    }
+
+    private void updateNation(Nation nat) {
+        if(!playersbynation) return;
+        Set<String> plids = new HashSet<String>();
+        List<Resident> res = nat.getResidents();
+        for(Resident r : res) {
+            plids.add(r.getName());
+        }
+        String setid = "towny.nation." + nat.getName();
+        PlayerSet set = markerapi.getPlayerSet(setid);  /* See if set exists */
+        if(set == null) {
+            set = markerapi.createPlayerSet(setid, true, plids, false);
+            info("Added player visibility set '" + setid + "' for nation " + nat.getName());
+        }
+        else {
+            set.setPlayers(plids);
+        }
+    }
+
+    private void updateNationPlayerSets() {
+        if(!playersbynation) return;
+        Map<String, Nation> nations = tuniv.getNationsMap();
+        for(Nation n : nations.values()) {
+            updateNation(n);
+        }
+    }
+
+    /* Cannot do this until towny add/remove player events are fixed
+    private class PlayerUpdate implements Runnable {
+        public void run() {
+            pending_upd = null;
+            if(stop) return;
+                
+            for(Town t : town_to_upd) {
+                updateTown(t);
+            }
+            for(Nation n : nation_to_upd) {
+                updateNation(n);
+            }
+            town_to_upd.clear();
+            nation_to_upd.clear();
+        }
+    }
+    
+    private HashSet<Town> town_to_upd = new HashSet<Town>();
+    private HashSet<Nation> nation_to_upd = new HashSet<Nation>();
+    private PlayerUpdate pending_upd;
+    
+    private void requestUpdateTownPlayers(Town t) {
+        if(playersbytown)
+            town_to_upd.add(t);
+        try {
+            if(playersbynation && t.hasNation())
+                nation_to_upd.add(t.getNation());
+        } catch (NotRegisteredException nrx) {
+        }
+        if(pending_upd == null) {
+            pending_upd = new PlayerUpdate();
+            getServer().getScheduler().scheduleSyncDelayedTask(this, pending_upd, 20);
+        }
+    }
+    */
     
     private Map<String, AreaMarker> resareas = new HashMap<String, AreaMarker>();
     private Map<String, Marker> resmark = new HashMap<String, Marker>();
@@ -643,13 +761,10 @@ public class DynmapTownyPlugin extends JavaPlugin {
         /* And replace with new map */
         resareas = newmap;
         resmark = newmark;
-        
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new TownyUpdate(), updperiod);
-        
+                
     }
     
     private class OurServerListener implements Listener {
-        @SuppressWarnings("unused")
         @EventHandler(priority=EventPriority.MONITOR)
         public void onPluginEnable(PluginEnableEvent event) {
             Plugin p = event.getPlugin();
@@ -664,6 +779,44 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 prepForChat();
             }
         }
+        // Event Not Usable - no handler list, as of 0.81.0.0
+        //@EventHandler(priority=EventPriority.MONITOR)
+        //public void onAddPlayerToTown(TownAddResidentEvent event) {
+        //    Town t = event.getTown();
+        //    requestUpdateTownPlayers(t);
+        //}
+        // Event Not Usable - no handler list, as of 0.81.0.0
+        //@EventHandler(priority=EventPriority.MONITOR)
+        //public void onRemovePlayerToTown(TownRemoveResidentEvent event) {
+        //    requestUpdateTownPlayers(event.getTown());
+        //}
+        /* Event isn't firing....
+        @EventHandler(priority=EventPriority.MONITOR)
+        public void onChangePlot(PlayerChangePlotEvent event) {
+            WorldCoord fromblk = event.getFrom();
+            WorldCoord toblk = event.getFrom();
+            try {
+                TownBlock tb = fromblk.getTownBlock();
+                if(tb != null) {
+                    Town t = tb.getTown();
+                    if(t != null) {
+                        requestUpdateTownMap(t);
+                    }
+                }
+            } catch (NotRegisteredException nrx) {
+            }
+            try {
+                TownBlock tb = toblk.getTownBlock();
+                if(tb != null) {
+                    Town t = tb.getTown();
+                    if(t != null) {
+                        requestUpdateTownMap(t);
+                    }
+                }
+            } catch (NotRegisteredException nrx) {
+            }
+        }
+        */
     }
     
     public void onEnable() {
@@ -716,6 +869,12 @@ public class DynmapTownyPlugin extends JavaPlugin {
         townblocksize = Coord.getCellSize();
         
         /* Load configuration */
+        if(reload) {
+            reloadConfig();
+        }
+        else {
+            reload = true;
+        }
         FileConfiguration cfg = getConfig();
         cfg.options().copyDefaults(true);   /* Load defaults, if needed */
         this.saveConfig();  /* Save updates, if needed */
@@ -770,6 +929,31 @@ public class DynmapTownyPlugin extends JavaPlugin {
         List<String> hid = cfg.getStringList("hiddenregions");
         if(hid != null) {
             hidden = new HashSet<String>(hid);
+        }
+        /* Check if player sets enabled */
+        playersbytown = cfg.getBoolean("visibility-by-town", false);
+        if(playersbytown) {
+            try {
+                if(!api.testIfPlayerInfoProtected()) {
+                    playersbytown = false;
+                    info("Dynmap does not have player-info-protected enabled - visibility-by-town will have no effect");
+                }
+            } catch (NoSuchMethodError x) {
+                playersbytown = false;
+                info("Dynmap does not support function needed for 'visibility-by-town' - need to upgrade to 0.60 or later");
+            }
+        }
+        playersbynation = cfg.getBoolean("visibility-by-nation", false);
+        if(playersbynation) {
+            try {
+                if(!api.testIfPlayerInfoProtected()) {
+                    playersbynation = false;
+                    info("Dynmap does not have player-info-protected enabled - visibility-by-nation will have no effect");
+                }
+            } catch (NoSuchMethodError x) {
+                playersbynation = false;
+                info("Dynmap does not support function needed for 'visibility-by-nation' - need to upgrade to 0.60 or later");
+            }
         }
 
         /* Set up update job - based on periond */
