@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dynmap</groupId>
   <artifactId>Dynmap-Towny</artifactId>
-  <version>0.18</version>
+  <version>0.20</version>
   
     <build>
   	  <resources>
@@ -56,8 +56,7 @@
   	<dependency>
   		<groupId>org.dynmap</groupId>
   		<artifactId>dynmap-api</artifactId>
-  		<version>[0.32,)</version>
-  		<scope>compile</scope>
+  		<version>[0.60,)</version>
   	</dependency>
   	<dependency>
   		<groupId>org.bukkit</groupId>
@@ -67,14 +66,14 @@
   	<dependency>
   		<groupId>com.palmergames</groupId>
   		<artifactId>Towny</artifactId>
-  		<version>0.80.1.0</version>
+  		<version>0.81.1.0</version>
   		<scope>system</scope>
   		<systemPath>${project.basedir}/Towny.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>com.palmergames</groupId>
   		<artifactId>TownyChat</artifactId>
-  		<version>0.80.1.0</version>
+  		<version>0.81.1.0</version>
   		<scope>system</scope>
   		<systemPath>${project.basedir}/TownyChat.jar</systemPath>
   	</dependency>
