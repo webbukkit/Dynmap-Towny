@@ -1,5 +1,6 @@
 package org.dynmap.towny;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -848,6 +849,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
             activate();
             prepForChat();
         }
+        try {
+            MetricsLite ml = new MetricsLite(this);
+            ml.start();
+        } catch (IOException iox) {
+        }
     }
     
     private void prepForChat() {
@@ -871,6 +877,10 @@ public class DynmapTownyPlugin extends JavaPlugin {
         /* Load configuration */
         if(reload) {
             reloadConfig();
+            if(set != null) {
+                set.deleteMarkerSet();
+                set = null;
+            }
         }
         else {
             reload = true;
