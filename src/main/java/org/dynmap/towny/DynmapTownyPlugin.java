@@ -14,14 +14,18 @@ import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.dynmap.DynmapAPI;
+import org.dynmap.DynmapWebChatEvent;
 import org.dynmap.markers.AreaMarker;
 import org.dynmap.markers.Marker;
 import org.dynmap.markers.MarkerAPI;
@@ -72,6 +76,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
     boolean show_embassies;
     boolean show_wilds;
     boolean stop;
+    boolean using_townychat = false;
     
     private static class AreaStyle {
         int strokecolor;
@@ -780,6 +785,33 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 prepForChat();
             }
         }
+
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onWebchatEvent(DynmapWebChatEvent event) {
+            if(using_townychat) {
+                if(!event.isCancelled() && !event.isProcessed()) {
+                    event.setProcessed();
+                    getServer().broadcastMessage("\u00A72[WEB] " + event.getName() + ": " + "\u00A7f" + event.getMessage());
+                }
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onPlayerLogin(PlayerLoginEvent event) {
+            if(using_townychat) {
+                Player player = event.getPlayer();
+                api.postPlayerJoinQuitToWeb(player, true);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onPlayerQuit(PlayerQuitEvent event) {
+            if(using_townychat) {
+                Player player = event.getPlayer();
+                api.postPlayerJoinQuitToWeb(player, false);
+            }
+        }
+
         // Event Not Usable - no handler list, as of 0.81.0.0
         //@EventHandler(priority=EventPriority.MONITOR)
         //public void onAddPlayerToTown(TownAddResidentEvent event) {
@@ -843,7 +875,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             townychat = (Chat)p;
         }
 
-        getServer().getPluginManager().registerEvents(new OurServerListener(), this);        
+        getServer().getPluginManager().registerEvents(new OurServerListener(), this);
         /* If both enabled, activate */
         if(dynmap.isEnabled() && towny.isEnabled()) {
             activate();
@@ -860,6 +892,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         /* If townychat is active, and we've found dynmap API */
         if((townychat != null) && townychat.isEnabled() && dynmap.isEnabled()) {
             api.setDisableChatToWebProcessing(true);
+            using_townychat = true;
             info("TownyChat detect: disabling normal chat-to-web processing in Dynmap");
         }
     }
