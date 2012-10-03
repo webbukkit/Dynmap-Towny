@@ -798,7 +798,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onPlayerLogin(PlayerLoginEvent event) {
-            if(using_townychat) {
+            if(using_townychat && event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
                 Player player = event.getPlayer();
                 api.postPlayerJoinQuitToWeb(player, true);
             }
