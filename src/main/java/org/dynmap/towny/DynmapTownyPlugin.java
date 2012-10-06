@@ -77,6 +77,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
     boolean show_wilds;
     boolean stop;
     boolean using_townychat = false;
+    boolean chat_sendlogin;
+    boolean chat_sendquit;
+    String chatformat;
     
     private static class AreaStyle {
         int strokecolor;
@@ -788,17 +791,18 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onWebchatEvent(DynmapWebChatEvent event) {
-            if(using_townychat) {
+            if(using_townychat && !chatformat.isEmpty()) {
                 if(!event.isCancelled() && !event.isProcessed()) {
                     event.setProcessed();
-                    getServer().broadcastMessage("\u00A72[WEB] " + event.getName() + ": " + "\u00A7f" + event.getMessage());
+                    String msg = chatformat.replace("&color;", "\u00A7").replace("%playername%", event.getName()).replace("%message%", event.getMessage());
+                    getServer().broadcastMessage(msg);
                 }
             }
         }
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onPlayerLogin(PlayerLoginEvent event) {
-            if(using_townychat) {
+            if(chat_sendlogin && using_townychat && event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
                 Player player = event.getPlayer();
                 api.postPlayerJoinQuitToWeb(player, true);
             }
@@ -806,7 +810,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onPlayerQuit(PlayerQuitEvent event) {
-            if(using_townychat) {
+            if(chat_sendquit && using_townychat) {
                 Player player = event.getPlayer();
                 api.postPlayerJoinQuitToWeb(player, false);
             }
@@ -973,6 +977,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
         if(hid != null) {
             hidden = new HashSet<String>(hid);
         }
+
+        chat_sendlogin = cfg.getBoolean("chat.sendlogin", true);
+        chat_sendquit = cfg.getBoolean("chat.sendquit", true);
+        chatformat = cfg.getString("chat.format", "&color;2[WEB] %playername%: &color;f%message%");
+
         /* Check if player sets enabled */
         playersbytown = cfg.getBoolean("visibility-by-town", false);
         if(playersbytown) {
