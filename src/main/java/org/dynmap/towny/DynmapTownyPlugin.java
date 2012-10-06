@@ -791,7 +791,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onWebchatEvent(DynmapWebChatEvent event) {
-            if(using_townychat) {
+            if(using_townychat && !chatformat.isEmpty()) {
                 if(!event.isCancelled() && !event.isProcessed()) {
                     event.setProcessed();
                     String msg = chatformat.replace("&color;", "\u00A7").replace("%playername%", event.getName()).replace("%message%", event.getMessage());
