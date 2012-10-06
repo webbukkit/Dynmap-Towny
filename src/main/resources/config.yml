@@ -67,3 +67,8 @@ nationstyle:
   _none_:
     homeicon: "greenflag"
     
+# Chat settings for use with TownyChat
+chat:
+  sendlogin: true
+  sendquit: true
+  format: "&color;2[WEB] %playername%: &color;f%message%"
