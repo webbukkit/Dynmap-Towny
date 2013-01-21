@@ -287,7 +287,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         }
     }
 
-    /* Update event from towny not being fired.... 
+    /*
     private class TownyUpdateReq implements Runnable {
         public void run() {
             if(!stop) {
@@ -304,8 +304,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             pending_upd_req = new TownyUpdateReq();
             getServer().getScheduler().scheduleSyncDelayedTask(this, pending_upd_req, 20);
         }
-    }
-    */
+    }*/
     
     private void updateTown(Town town) {
         if(!playersbytown) return;
@@ -815,19 +814,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 api.postPlayerJoinQuitToWeb(player, false);
             }
         }
-
-        // Event Not Usable - no handler list, as of 0.81.0.0
-        //@EventHandler(priority=EventPriority.MONITOR)
-        //public void onAddPlayerToTown(TownAddResidentEvent event) {
-        //    Town t = event.getTown();
-        //    requestUpdateTownPlayers(t);
-        //}
-        // Event Not Usable - no handler list, as of 0.81.0.0
-        //@EventHandler(priority=EventPriority.MONITOR)
-        //public void onRemovePlayerToTown(TownRemoveResidentEvent event) {
-        //    requestUpdateTownPlayers(event.getTown());
-        //}
-        /* Event isn't firing....
+        /*
         @EventHandler(priority=EventPriority.MONITOR)
         public void onChangePlot(PlayerChangePlotEvent event) {
             WorldCoord fromblk = event.getFrom();
