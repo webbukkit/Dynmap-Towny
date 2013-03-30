@@ -46,8 +46,7 @@ import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.palmergames.bukkit.TownyChat.Chat;
 
 public class DynmapTownyPlugin extends JavaPlugin {
-    private static final Logger log = Logger.getLogger("Minecraft");
-    private static final String LOG_PREFIX = "[Dynmap-Towny] ";
+    private static Logger log;
     private static final String DEF_INFOWINDOW = "<div class=\"infowindow\"><span style=\"font-size:120%;\">%regionname% (%nation%)</span><br /> Mayor <span style=\"font-weight:bold;\">%playerowners%</span><br /> Associates <span style=\"font-weight:bold;\">%playermanagers%</span><br/>Flags<br /><span style=\"font-weight:bold;\">%flags%</span></div>";
     private static final String NATION_NONE = "_none_";
     Plugin dynmap;
@@ -80,6 +79,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
     boolean chat_sendlogin;
     boolean chat_sendquit;
     String chatformat;
+    
+    @Override
+    public void onLoad() {
+        log = this.getLogger();
+    }
     
     private static class AreaStyle {
         int strokecolor;
@@ -270,10 +274,10 @@ public class DynmapTownyPlugin extends JavaPlugin {
     }
     
     public static void info(String msg) {
-        log.log(Level.INFO, LOG_PREFIX + msg);
+        log.log(Level.INFO, msg);
     }
     public static void severe(String msg) {
-        log.log(Level.SEVERE, LOG_PREFIX + msg);
+        log.log(Level.SEVERE, msg);
     }
 
     private class TownyUpdate implements Runnable {
