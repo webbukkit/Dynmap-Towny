@@ -34,30 +34,6 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-  		<plugin>
-  			<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-    				<descriptors>
-        				<descriptor>src/main/assembly/package.xml</descriptor>
-    				</descriptors>
-					<!-- Hack for bug in maven-assembly: http://jira.codehaus.org/browse/MASSEMBLY-449 -->
-					<archiverConfig>
-						<fileMode>420</fileMode> <!-- 420(dec) = 644(oct) -->
-						<directoryMode>493</directoryMode> <!-- 493(dec) = 755(oct) -->
-						<defaultDirectoryMode>493</defaultDirectoryMode>
-					</archiverConfig>
-				</configuration>
-  			
-  			<executions>
-  				<execution>
-  					<id>build</id>
-  					<phase>package</phase>
-  					<goals>
-  						<goal>single</goal>
-  					</goals>
-  				</execution>
-  			</executions>
-  		</plugin>
   	</plugins>
   </build>
      <repositories>
@@ -83,26 +59,26 @@
   	<dependency>
   		<groupId>org.dynmap</groupId>
   		<artifactId>dynmap-api</artifactId>
-  		<version>1.3</version>
+  		<version>1.7</version>
   	</dependency>
   	<dependency>
   		<groupId>org.bukkit</groupId>
   		<artifactId>bukkit</artifactId>
-  		<version>1.4.5-R1.0</version>
+  		<version>1.5.1-R0.1</version>
   	</dependency>
   	<dependency>
   		<groupId>com.palmergames</groupId>
   		<artifactId>Towny</artifactId>
-  		<version>0.82.0.5</version>
+  		<version>0.83.0.0</version>
   		<scope>system</scope>
-  		<systemPath>${project.basedir}/Towny-0.82.0.5.jar</systemPath>
+  		<systemPath>${project.basedir}/Towny-0.83.0.0.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>com.palmergames</groupId>
   		<artifactId>TownyChat</artifactId>
-  		<version>0.31</version>
+  		<version>0.38</version>
   		<scope>system</scope>
-  		<systemPath>${project.basedir}/TownyChat-0.31.jar</systemPath>
+  		<systemPath>${project.basedir}/TownyChat-0.38.jar</systemPath>
   	</dependency>
   </dependencies>
   <properties>

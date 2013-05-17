@@ -41,6 +41,7 @@ regionstyle:
   fillColorArenas: "#FF00FF"
   fillColorEmbassies: "#00FFFF"
   fillColorWilds: "#00FF00"
+  boost: false
   
 # Optional setting to limit which regions to show, by name - if commented out, all regions are shown
 # To show all regions on a given world, add 'world:<worldname>' to the list
@@ -58,12 +59,14 @@ custstyle:
   customregion2:
     strokeColor: "#007F00"
     y: 64
+    boost: false
 
 # Optional per-nation overrides (custstyle has priority over nationstyle),  _none_ is used for towns with no nation
 nationstyle:  
   NationOfBlue:
     strokeColor: "#0000FF"
     fillColor: "#0000FF"
+    boost: false
   _none_:
     homeicon: "greenflag"
     

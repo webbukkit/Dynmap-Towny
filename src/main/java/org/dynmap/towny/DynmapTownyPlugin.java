@@ -100,6 +100,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         MarkerIcon homeicon;
         MarkerIcon capitalicon;
         int yc;
+        boolean boost;
 
         AreaStyle(FileConfiguration cfg, String path, MarkerAPI markerapi) {
             String sc = cfg.getString(path+".strokeColor", null);
@@ -111,6 +112,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             String fce = cfg.getString(path+".fillColorEmbassies", null);
             String fcw = cfg.getString(path+".fillColorWilds", null);
             yc = cfg.getInt(path+".y", -1);
+            boost = cfg.getBoolean(path+".boost", false);
             
             strokecolor = -1;
             fillcolor = -1;
@@ -270,6 +272,14 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 return yc;
             else
                 return 64;
+        }
+        public boolean getBoost(AreaStyle cust, AreaStyle nat) {
+            if((cust != null) && cust.boost)
+                return cust.boost;
+            else if((nat != null) && nat.boost)
+                return nat.boost;
+            else 
+                return boost;
         }
     }
     
@@ -466,6 +476,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         m.setFillStyle(defstyle.getFillOpacity(as, ns), defstyle.getFillColor(as, ns, btype));
         double y = defstyle.getY(as, ns);
         m.setRangeY(y, y);
+        m.setBoostFlag(defstyle.getBoost(as, ns));
     }
     
     private MarkerIcon getMarkerIcon(Town town) {
