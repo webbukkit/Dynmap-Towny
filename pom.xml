@@ -69,16 +69,16 @@
   	<dependency>
   		<groupId>com.palmergames</groupId>
   		<artifactId>Towny</artifactId>
-  		<version>0.86.1.0</version>
+  		<version>0.88.0.0</version>
   		<scope>system</scope>
-  		<systemPath>${project.basedir}/Towny-0.86.1.0.jar</systemPath>
+  		<systemPath>${project.basedir}/Towny-0.88.0.0.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>com.palmergames</groupId>
   		<artifactId>TownyChat</artifactId>
-  		<version>0.86.1.0</version>
+  		<version>0.88.0.0</version>
   		<scope>system</scope>
-  		<systemPath>${project.basedir}/TownyChat-0.86.1.0.jar</systemPath>
+  		<systemPath>${project.basedir}/TownyChat-0.88.0.0.jar</systemPath>
   	</dependency>
   </dependencies>
   <properties>
