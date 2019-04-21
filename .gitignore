@@ -2,6 +2,10 @@
 /.classpath
 /.project
 /.settings
+/.vscode
+
+#dependencies
+/deps
 
 # netbeans
 /nbproject

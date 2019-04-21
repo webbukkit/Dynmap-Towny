@@ -887,11 +887,6 @@ public class DynmapTownyPlugin extends JavaPlugin {
             activate();
             prepForChat();
         }
-        try {
-            MetricsLite ml = new MetricsLite(this);
-            ml.start();
-        } catch (IOException iox) {
-        }
     }
     
     private void prepForChat() {
