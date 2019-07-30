@@ -34,13 +34,14 @@ import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.PlayerSet;
 
 import com.palmergames.bukkit.towny.Towny;
+import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.Coord;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownBlockType;
-import com.palmergames.bukkit.towny.object.TownyUniverse;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 
 import com.palmergames.bukkit.TownyChat.Chat;
@@ -340,7 +341,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
     private void updateTownPlayerSets() {
         if(!playersbytown) return;
-        Map<String,Town> towns = tuniv.getTownsMap();
+        Map<String,Town> towns = TownyUniverse.getInstance().getTownsMap();
         for(Town t : towns.values()) {
             updateTown(t);
         }
@@ -366,7 +367,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
     private void updateNationPlayerSets() {
         if(!playersbynation) return;
-        Map<String, Nation> nations = tuniv.getNationsMap();
+        Map<String, Nation> nations = TownyUniverse.getInstance().getNationsMap();
         for(Nation n : nations.values()) {
             updateNation(n);
         }
@@ -758,7 +759,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         Map<String,Marker> newmark = new HashMap<String,Marker>(); /* Build new map */
         
         /* Loop through towns */
-        List<Town> towns = TownyUniverse.getDataSource().getTowns();
+        List<Town> towns = TownyAPI.getInstance().getDataSource().getTowns();
         for(Town t : towns) {
     		handleTown(t, newmap, newmark, null);
     		if(show_shops) {
@@ -905,7 +906,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             return;
         }
         /* Connect to towny API */
-        tuniv = towny.getTownyUniverse();
+        tuniv = TownyUniverse.getInstance();
         townblocksize = Coord.getCellSize();
         
         /* Load configuration */

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dynmap</groupId>
   <artifactId>Dynmap-Towny</artifactId>
-  <version>0.72</version>
+  <version>0.73</version>
   
     <build>
   	  <resources>
@@ -53,26 +53,26 @@
   		<artifactId>dynmap-api</artifactId>
   		<version>2.2</version>
   	</dependency>
-  	<dependency>
-  		<groupId>org.bukkit</groupId>
-  		<artifactId>bukkit</artifactId>
-  		<version>1.13.2-R0.1-SNAPSHOT</version>
-			<scope>system</scope>
-  		<systemPath>${project.basedir}/deps/craftbukkit-1.13.2-R0.1-SNAPSHOT.jar</systemPath>
-  	</dependency>
+    <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.14.4-R0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/deps/bukkit.jar</systemPath>
+    </dependency>
   	<dependency>
   		<groupId>com.palmergames</groupId>
   		<artifactId>Towny</artifactId>
-  		<version>0.93.0.0</version>
+  		<version>0.94.0.4</version>
   		<scope>system</scope>
-  		<systemPath>${project.basedir}/deps/Towny-0.93.0.0.jar</systemPath>
+  		<systemPath>${project.basedir}/deps/Towny-0.94.0.4.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>com.palmergames</groupId>
   		<artifactId>TownyChat</artifactId>
-  		<version>0.93.0.0</version>
+  		<version>0.55</version>
   		<scope>system</scope>
-  		<systemPath>${project.basedir}/deps/TownyChat-0.93.0.0.jar</systemPath>
+  		<systemPath>${project.basedir}/deps/TownyChat-0.55.jar</systemPath>
   	</dependency>
   </dependencies>
   <properties>

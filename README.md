@@ -17,13 +17,14 @@ Note: If you are currently using the region component for Towny in Dynmap, you s
 ## Supported Versions
 
 -   Dynmap v1.7.1 or later 
--   Towny Advanced 0.93.0.0 or later
+-   Towny Advanced 0.94.0.2 or later
 
 ## Plugin Configuration
 After the first load, there will be a config.yml file in the plugins/Dynmap-Towny directory. Details of the default configuration, and all the provided settings, can be found [here](https://github.com/hankjordan/Dynmap-Towny/wiki)
 
 ## Building from source
-Place Towny-0.93.0.0.jar, TownyChat-0.93.0.0.jar and craftbukkit-1.13.2-R0.1-SNAPSHOT.jar a folder named deps in the root directory. Compile using maven. Requires Java 8.
+Place Towny-0.94.0.4.jar, TownyChat-0.55.jar and bukkit.jar a folder named deps in the root directory. Compile using maven. Requires Java 8.
 
 ## Acknowledgements
 This is a fork of [Dynmap-Towny](https://github.com/webbukkit/Dynmap-Towny).
+I forked this from Hank Jordan who forked it from the original repo.
