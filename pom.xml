@@ -45,6 +45,10 @@
 			<id>dynmap-repo</id>
 			<url>http://repo.mikeprimm.com/</url>
 		</repository>
+        <repository>
+            <id>github-Towny</id>
+            <url>https://maven.pkg.github.com/TownyAdvanced/Towny</url>
+        </repository> 
 	</repositories>
   
   <dependencies>
@@ -61,11 +65,10 @@
             <systemPath>${project.basedir}/deps/bukkit.jar</systemPath>
     </dependency>
   	<dependency>
-  		<groupId>com.palmergames</groupId>
-  		<artifactId>Towny</artifactId>
-  		<version>0.94.0.4</version>
-  		<scope>system</scope>
-  		<systemPath>${project.basedir}/deps/Towny-0.94.0.4.jar</systemPath>
+      <groupId>com.palmergames.bukkit.towny</groupId>
+      <artifactId>Towny</artifactId>
+      <version>0.94.0.12</version>
+      <scope>provided</scope>
   	</dependency>
   	<dependency>
   		<groupId>com.palmergames</groupId>
