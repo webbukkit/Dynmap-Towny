@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dynmap</groupId>
   <artifactId>Dynmap-Towny</artifactId>
-  <version>0.73</version>
+  <version>0.74</version>
   
     <build>
   	  <resources>
@@ -47,7 +47,7 @@
 		</repository>
         <repository>
             <id>github-Towny</id>
-            <url>https://maven.pkg.github.com/TownyAdvanced/Towny</url>
+            <url>https://maven.pkg.github.com/TownyAdvanced/Towny/packages/</url>
         </repository> 
 	</repositories>
   
@@ -67,7 +67,7 @@
   	<dependency>
       <groupId>com.palmergames.bukkit.towny</groupId>
       <artifactId>Towny</artifactId>
-      <version>0.94.0.12</version>
+      <version>0.95.0.5</version>
       <scope>provided</scope>
   	</dependency>
   	<dependency>
