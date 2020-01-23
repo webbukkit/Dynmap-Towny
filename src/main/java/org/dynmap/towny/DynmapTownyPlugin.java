@@ -829,6 +829,19 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 api.postPlayerJoinQuitToWeb(player, false);
             }
         }
+
+        @EventHandler(priority=EventPriority.NORMAL)
+        private void onDynMapReload (PluginEnableEvent event) {
+        	if (event.getPlugin().getName().equals("dynmap")) {
+                PluginManager pluginManager = getServer().getPluginManager();
+                if (pluginManager.isPluginEnabled("Dynmap-Towny")) {                	
+	                pluginManager.disablePlugin(DynmapTownyPlugin.this);
+	                pluginManager.enablePlugin(DynmapTownyPlugin.this);
+                }
+        	}
+        	
+        }
+
         /*
         @EventHandler(priority=EventPriority.MONITOR)
         public void onChangePlot(PlayerChangePlotEvent event) {
