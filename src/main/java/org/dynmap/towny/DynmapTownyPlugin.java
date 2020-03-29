@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.palmergames.bukkit.towny.TownyFormatter;
+import com.palmergames.bukkit.towny.TownySettings;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -432,6 +434,21 @@ public class DynmapTownyPlugin extends JavaPlugin {
         }
         v = v.replace("%playermanagers%", res);
 
+        String dispNames = "";
+        for (Resident r: town.getResidents()) {
+            Player p = Bukkit.getPlayer(r.getName());
+            if(dispNames.length()>0) mgrs += ", ";
+
+            if (p == null) {
+                dispNames += r.getFormattedName();
+                continue;
+            }
+
+            dispNames += p.getDisplayName();
+        }
+
+        v = v.replace("%residentdisplaynames%", dispNames);
+
         v = v.replace("%residentcount%", town.getResidents().size() + "");
         v = v.replace("%founded%", town.getRegistered() != 0 ? TownyFormatter.registeredFormat.format(town.getRegistered()) : "Not set");
         v = v.replace("%board%", town.getTownBoard());
@@ -445,15 +462,26 @@ public class DynmapTownyPlugin extends JavaPlugin {
 		} catch (Exception e) {
 		}
         v = v.replace("%nation%", nation);
+
+		String natStatus = "";
+        if (town.isCapital()) {
+            natStatus = "Capital of " + nation;
+        } else if (town.hasNation()) {
+            natStatus = "Member of " + nation;
+        }
+
+        v = v.replace("%nationstatus%", natStatus);
+
         /* Build flags */
-        String flgs = "hasUpkeep: " + town.hasUpkeep();
+        String flgs = "Upkeep: " + TownySettings.getTownUpkeepCost(town);
         flgs += "<br/>pvp: " + town.isPVP();
         flgs += "<br/>mobs: " + town.hasMobs();
         flgs += "<br/>public: " + town.isPublic();
         flgs += "<br/>explosion: " + town.isBANG();
         flgs += "<br/>fire: " + town.isFire();
-        flgs += "<br/>capital: " + town.isCapital();
+        flgs += "<br/>nation: " + nation;
         v = v.replace("%flags%", flgs);
+
         return v;
     }
     
