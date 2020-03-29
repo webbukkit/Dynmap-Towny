@@ -430,6 +430,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
             mgrs += r.getName();
         }
         v = v.replace("%playermanagers%", res);
+
+        v = v.replace("%residentcount%", town.getResidents().size() + "");
+        v = v.replace("%board%", town.getTownBoard());
+        v = v.replace("%tax%", town.getTaxes() + "");
+        v = v.replace("%bank%", town.getAccount().getHoldingFormattedBalance());
         
         String nation = "";
 		try {
