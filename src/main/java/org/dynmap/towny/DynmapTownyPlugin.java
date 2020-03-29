@@ -452,7 +452,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         v = v.replace("%residentcount%", town.getResidents().size() + "");
         v = v.replace("%founded%", town.getRegistered() != 0 ? TownyFormatter.registeredFormat.format(town.getRegistered()) : "Not set");
         v = v.replace("%board%", town.getTownBoard());
-        v = v.replace("%tax%", town.getTaxes() + "");
+        v = v.replace("%tax%", "$" + town.getTaxes());
         v = v.replace("%bank%", town.getAccount().getHoldingFormattedBalance());
         
         String nation = "";
@@ -472,8 +472,10 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         v = v.replace("%nationstatus%", natStatus);
 
+        v = v.replace("%upkeep%", "$" + TownySettings.getTownUpkeepCost(town));
+
         /* Build flags */
-        String flgs = "Upkeep: " + TownySettings.getTownUpkeepCost(town);
+        String flgs = "Has Upkeep: " + town.hasUpkeep();
         flgs += "<br/>pvp: " + town.isPVP();
         flgs += "<br/>mobs: " + town.hasMobs();
         flgs += "<br/>public: " + town.isPublic();
