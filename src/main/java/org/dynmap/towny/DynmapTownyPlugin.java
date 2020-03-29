@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.palmergames.bukkit.towny.TownyFormatter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -432,6 +433,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         v = v.replace("%playermanagers%", res);
 
         v = v.replace("%residentcount%", town.getResidents().size() + "");
+        v = v.replace("%founded%", town.getRegistered() != 0 ? TownyFormatter.registeredFormat.format(town.getRegistered()) : "Not set");
         v = v.replace("%board%", town.getTownBoard());
         v = v.replace("%tax%", town.getTaxes() + "");
         v = v.replace("%bank%", town.getAccount().getHoldingFormattedBalance());
