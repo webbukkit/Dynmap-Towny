@@ -452,7 +452,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         v = v.replace("%residentcount%", town.getResidents().size() + "");
         v = v.replace("%founded%", town.getRegistered() != 0 ? TownyFormatter.registeredFormat.format(town.getRegistered()) : "Not set");
         v = v.replace("%board%", town.getTownBoard());
-        v = v.replace("%tax%", "$" + town.getTaxes());
+        v = v.replace("%tax%", "%" + town.getTaxes());
         v = v.replace("%bank%", town.getAccount().getHoldingFormattedBalance());
         
         String nation = "";
