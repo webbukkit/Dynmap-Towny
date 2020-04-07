@@ -299,7 +299,6 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 updateTowns();
                 updateTownPlayerSets();
                 updateNationPlayerSets();
-                getServer().getScheduler().scheduleSyncDelayedTask(DynmapTownyPlugin.this, this, updperiod);
             }
         }
     }
@@ -1052,8 +1051,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
         if(per < 15) per = 15;
         updperiod = (per*20);
         stop = false;
-        
-        getServer().getScheduler().scheduleSyncDelayedTask(this, new TownyUpdate(), 40);   /* First time is 2 seconds */
+
+        getServer().getScheduler().runTaskTimerAsynchronously(this, new TownyUpdate(), 40, per);
         
         info("version " + this.getDescription().getVersion() + " is activated");
     }
