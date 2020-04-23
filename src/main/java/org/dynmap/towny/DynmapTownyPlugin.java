@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyFormatter;
 import com.palmergames.bukkit.towny.TownySettings;
 import org.bukkit.Bukkit;
@@ -455,7 +456,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         if (town.isTaxPercentage()) {
             v = v.replace("%tax%", town.getTaxes() + "%");
         } else {
-            v = v.replace("%tax%", "$" + town.getTaxes());
+            v = v.replace("%tax%", TownyEconomyHandler.getFormattedBalance(town.getTaxes()));
         }
 
         v = v.replace("%bank%", town.getAccount().getHoldingFormattedBalance());
@@ -477,7 +478,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         v = v.replace("%nationstatus%", natStatus);
 
-        v = v.replace("%upkeep%", "$" + TownySettings.getTownUpkeepCost(town));
+        v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
 
         /* Build flags */
         String flgs = "Has Upkeep: " + town.hasUpkeep();
