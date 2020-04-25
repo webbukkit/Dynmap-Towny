@@ -63,6 +63,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
     boolean reload = false;
     private boolean playersbytown;
     private boolean playersbynation;
+    private boolean dynamicNationColorsEnabled;
     
     FileConfiguration cfg;
     MarkerSet set;
@@ -506,7 +507,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         return true;
     }
         
-    private void addStyle(String resid, String natid, AreaMarker m, TownBlockType btype) {
+    private void addStyle(Town town, String resid, String natid, AreaMarker m, TownBlockType btype) {
         AreaStyle as = cusstyle.get(resid);	/* Look up custom style for town, if any */
         AreaStyle ns = nationstyle.get(natid);	/* Look up nation style, if any */
         
@@ -520,8 +521,30 @@ public class DynmapTownyPlugin extends JavaPlugin {
         double y = defstyle.getY(as, ns);
         m.setRangeY(y, y);
         m.setBoostFlag(defstyle.getBoost(as, ns));
+
+        //If dynamic nation colors is enabled, read the color from the nation object
+        try {
+            if(dynamicNationColorsEnabled && town.hasNation()) {
+                Nation nation = town.getNation();
+
+                if(nation.getMapColorHexCode() != null) {
+                    String colorAsString = nation.getMapColorHexCode();
+                    int nationColor =  Integer.parseInt(colorAsString, 16);
+
+                    //Set stroke style
+                    double strokeOpacity = m.getLineOpacity();
+                    int strokeWeight = m.getLineWeight();
+                    m.setLineStyle(strokeWeight, strokeOpacity, nationColor);
+
+                    //Set fill style
+                    double fillOpacity = m.getFillOpacity();
+                    m.setFillStyle(fillOpacity, nationColor);
+                }
+            }
+        } catch (Exception ex) {}
+
     }
-    
+
     private MarkerIcon getMarkerIcon(Town town) {
         String id = town.getName();
         AreaStyle as = cusstyle.get(id);
@@ -755,7 +778,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 	if(town.getNation() != null)
                 		nation = town.getNation().getName();
                 } catch (Exception ex) {}
-                addStyle(town.getName(), nation, m, btype);
+                addStyle(town, town.getName(), nation, m, btype);
 
                 /* Add to map */
                 newmap.put(polyid, m);
@@ -1046,6 +1069,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 info("Dynmap does not support function needed for 'visibility-by-nation' - need to upgrade to 0.60 or later");
             }
         }
+
+        dynamicNationColorsEnabled = cfg.getBoolean("dynamic-nation-colors", true);
 
         /* Set up update job - based on periond */
         int per = cfg.getInt("update.period", 300);

@@ -4,6 +4,10 @@
 /.settings
 /.vscode
 
+# Intellij
+.idea
+*.iml
+
 #dependencies
 /deps
 
