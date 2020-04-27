@@ -306,7 +306,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 updateTowns();
                 updateTownPlayerSets();
                 updateNationPlayerSets();
-                updateTownBanks(System.currentTimeMillis());
+                if (TownySettings.isUsingEconomy())
+                    updateTownBanks(System.currentTimeMillis());
             }
         }
     }
@@ -391,11 +392,15 @@ public class DynmapTownyPlugin extends JavaPlugin {
     }
     
     private void updateTownBank(Town town) {
-    	try {
-			townBankBalanceCache.put(town, town.getAccount().getHoldingBalance());
-			townBankCache.put(town, System.currentTimeMillis() + ThreadLocalRandom.current().nextLong(300000, 360000)); // 5-6 Minutes added before next refresh.
-		} catch (EconomyException ignored) {
+
+    	double balance = 0.0;
+        try {
+			balance = town.getAccount().getHoldingBalance();
+		} catch (EconomyException | NullPointerException e) {
+			return;
 		}
+		townBankBalanceCache.put(town, balance);
+		townBankCache.put(town, System.currentTimeMillis() + ThreadLocalRandom.current().nextLong(300000, 360000)); // 5-6 Minutes added before next refresh.
     }
     
     /* Cannot do this until towny add/remove player events are fixed
@@ -483,7 +488,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             v = v.replace("%tax%", TownyEconomyHandler.getFormattedBalance(town.getTaxes()));
         }
 
-        v = v.replace("%bank%", TownyEconomyHandler.getFormattedBalance(townBankBalanceCache.get(town)));
+       	v = v.replace("%bank%", townBankBalanceCache.containsKey(town) ? TownyEconomyHandler.getFormattedBalance(townBankBalanceCache.get(town)) : "Accounts loading...");
         
         String nation = "";
 		try {
@@ -1010,12 +1015,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         FileConfiguration cfg = getConfig();
         cfg.options().copyDefaults(true);   /* Load defaults, if needed */
         this.saveConfig();  /* Save updates, if needed */
-        
-        /* Fill in townBankCache with towns and times to update cache */
-		for (Town town : TownyUniverse.getInstance().getTownsMap().values()) {		
-				updateTownBank(town);
-		}
-        
+
         /* Now, add marker set for mobs (make it transient) */
         set = markerapi.getMarkerSet("towny.markerset");
         if(set == null)
