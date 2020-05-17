@@ -15,11 +15,11 @@ Also, the display of the town outlines can be restricted to a minimum zoom-in le
 Note: If you are currently using the region component for Towny in Dynmap, you should disable that support
 
 ## Supported Versions
-As of 0.75, Dynmap-Towny has the following minimum requirements:
+As of 0.79, Dynmap-Towny has the following minimum requirements:
 
 -   CraftBukkit / Spigot / Paper 1.14.4 _OR_ 1.15.2
 -   Dynmap 2.5 or later 
--   TownyAdvanced 0.95.2.10 or later
+-   TownyAdvanced 0.96.1.2 or later
 -   TownyChat 0.65 or later (_Optional_)
 
 ## Plugin Configuration
