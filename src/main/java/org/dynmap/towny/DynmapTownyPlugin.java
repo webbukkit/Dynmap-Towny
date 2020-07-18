@@ -2,6 +2,7 @@ package org.dynmap.towny;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -628,7 +629,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         int poly_index = 0; /* Index of polygon for given town */
                 
         /* Handle areas */
-    	List<TownBlock> blocks = town.getTownBlocks();
+    	Collection<TownBlock> blocks = town.getTownBlocks();
     	if(blocks.isEmpty())
     	    return;
         /* Build popup */
