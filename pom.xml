@@ -66,7 +66,7 @@
         <dependency>
             <groupId>com.github.TownyAdvanced</groupId>
             <artifactId>Towny</artifactId>
-            <version>0.96.2.0</version>
+            <version>0.96.2.5</version>
         </dependency>
         <dependency>
             <groupId>com.palmergames</groupId>
