@@ -457,7 +457,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         }
         v = v.replace("%playermembers%", res);
         String mgrs = "";
-        for(Resident r : town.getAssistants()) {
+        for(Resident r : town.getRank("assistant")) {
             if(mgrs.length()>0) mgrs += ", ";
             mgrs += r.getName();
         }
@@ -481,7 +481,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         v = v.replace("%residentcount%", town.getResidents().size() + "");
         v = v.replace("%founded%", town.getRegistered() != 0 ? TownyFormatter.registeredFormat.format(town.getRegistered()) : "Not set");
-        v = v.replace("%board%", town.getTownBoard());
+        v = v.replace("%board%", town.getBoard());
 
         if (town.isTaxPercentage()) {
             v = v.replace("%tax%", town.getTaxes() + "%");
@@ -508,7 +508,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         v = v.replace("%nationstatus%", natStatus);
 
-        v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
+        if (TownySettings.isUsingEconomy())
+        	v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
 
         /* Build flags */
         String flgs = "Has Upkeep: " + town.hasUpkeep();
