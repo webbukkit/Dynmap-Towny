@@ -483,14 +483,15 @@ public class DynmapTownyPlugin extends JavaPlugin {
         v = v.replace("%founded%", town.getRegistered() != 0 ? TownyFormatter.registeredFormat.format(town.getRegistered()) : "Not set");
         v = v.replace("%board%", town.getBoard());
 
-        if (town.isTaxPercentage()) {
-            v = v.replace("%tax%", town.getTaxes() + "%");
-        } else {
-            v = v.replace("%tax%", TownyEconomyHandler.getFormattedBalance(town.getTaxes()));
+        if (TownySettings.isUsingEconomy() && TownyEconomyHandler.isActive()) {
+	        if (town.isTaxPercentage()) {
+	            v = v.replace("%tax%", town.getTaxes() + "%");
+	        } else {
+	            v = v.replace("%tax%", TownyEconomyHandler.getFormattedBalance(town.getTaxes()));
+	        }
+	
+	       	v = v.replace("%bank%", townBankBalanceCache.containsKey(town) ? TownyEconomyHandler.getFormattedBalance(townBankBalanceCache.get(town)) : "Accounts loading...");
         }
-
-       	v = v.replace("%bank%", townBankBalanceCache.containsKey(town) ? TownyEconomyHandler.getFormattedBalance(townBankBalanceCache.get(town)) : "Accounts loading...");
-        
         String nation = "";
 		try {
 			if(town.hasNation())
