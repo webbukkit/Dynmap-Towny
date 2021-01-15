@@ -509,7 +509,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         v = v.replace("%nationstatus%", natStatus);
 
-        if (TownySettings.isUsingEconomy())
+        if (TownyEconomyHandler.isActive() && TownySettings.isUsingEconomy())
         	v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
 
         /* Build flags */
