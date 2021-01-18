@@ -49,10 +49,12 @@ import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.exceptions.EconomyException;
 import com.palmergames.bukkit.towny.object.TownyWorld;
-
+import com.palmergames.bukkit.util.Version;
 import com.palmergames.bukkit.TownyChat.Chat;
 
 public class DynmapTownyPlugin extends JavaPlugin {
+	
+	private static Version requiredTownyVersion = Version.fromString("0.96.6.0");
     private static Logger log;
     private static final String DEF_INFOWINDOW = "<div class=\"infowindow\"><span style=\"font-size:120%;\">%regionname% (%nation%)</span><br /> Mayor <span style=\"font-weight:bold;\">%playerowners%</span><br /> Associates <span style=\"font-weight:bold;\">%playermanagers%</span><br/>Flags<br /><span style=\"font-weight:bold;\">%flags%</span></div>";
     private static final String NATION_NONE = "_none_";
@@ -352,7 +354,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
     private void updateTownPlayerSets() {
         if(!playersbytown) return;
-        for(Town t : TownyUniverse.getInstance().getTownsMap().values()) {
+        for(Town t : TownyUniverse.getInstance().getTowns()) {
             updateTown(t);
         }
     }
@@ -377,13 +379,13 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
     private void updateNationPlayerSets() {
         if(!playersbynation) return;
-        for(Nation n : TownyUniverse.getInstance().getNationsMap().values()) {
+        for(Nation n : TownyUniverse.getInstance().getNations()) {
             updateNation(n);
         }
     }
 
     private void updateTownBanks(long time) {
-		for (Town town : TownyUniverse.getInstance().getTownsMap().values())
+		for (Town town : TownyUniverse.getInstance().getTowns())
 			if (townBankCache.containsKey(town)) {
 				if (time > townBankCache.get(town))
 					updateTownBank(town);    			
@@ -976,6 +978,15 @@ public class DynmapTownyPlugin extends JavaPlugin {
         if(p != null) {
             townychat = (Chat)p;
         }
+        
+		if (Version.fromString(towny.getDescription().getVersion()).compareTo(requiredTownyVersion) >= 0) {
+			getLogger().severe("Towny version does not meet required minimum version: " + requiredTownyVersion.toString());
+			this.getServer().getPluginManager().disablePlugin(this);
+			return;
+		} else {
+			getLogger().info("Towny version " + towny.getDescription().getVersion() + " found.");
+		}
+        
 
         getServer().getPluginManager().registerEvents(new OurServerListener(), this);
         /* If both enabled, activate */

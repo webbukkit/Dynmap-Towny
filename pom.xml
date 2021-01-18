@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dynmap</groupId>
     <artifactId>Dynmap-Towny</artifactId>
-    <version>0.84</version>
+    <version>0.85</version>
 
     <build>
         <resources>
@@ -66,12 +66,12 @@
         <dependency>
             <groupId>com.github.TownyAdvanced</groupId>
             <artifactId>Towny</artifactId>
-            <version>0.96.5.0</version>
+            <version>0.96.6.0</version>
         </dependency>
         <dependency>
 	        <groupId>com.github.TownyAdvanced</groupId>
 	        <artifactId>TownyChat</artifactId>
-    	    <version>0.84</version>
+    	    <version>0.85</version>
         </dependency>
     </dependencies>
     <properties>
