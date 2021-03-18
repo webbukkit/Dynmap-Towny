@@ -977,7 +977,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             townychat = (Chat)p;
         }
         
-		if (Version.fromString(towny.getDescription().getVersion()).compareTo(requiredTownyVersion) >= 0) {
+		if (Version.fromString(towny.getDescription().getVersion()).compareTo(requiredTownyVersion) < 0) {
 			getLogger().severe("Towny version does not meet required minimum version: " + requiredTownyVersion.toString());
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
