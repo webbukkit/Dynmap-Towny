@@ -557,19 +557,21 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         //If dynamic nation colors is enabled, read the color from the nation object
         try {
-            if(dynamicNationColorsEnabled && town.hasNation()) {
-                if(town.getMapColorHexCode() != null) {
-                    //Get town map colour
-                    int townMapColor = Integer.parseInt(town.getMapColorHexCode(), 16);
+            if(dynamicNationColorsEnabled) {
+                //Get town map colour (if any)
+                String townMapColorHexCode = town.getMapColorHexCode();
+                if(townMapColorHexCode != null) {
+                    //Get colour as int
+                    int townMapColorInteger = Integer.parseInt(townMapColorHexCode, 16);
 
                     //Set stroke style
                     double strokeOpacity = m.getLineOpacity();
                     int strokeWeight = m.getLineWeight();
-                    m.setLineStyle(strokeWeight, strokeOpacity, townMapColor);
+                    m.setLineStyle(strokeWeight, strokeOpacity, townMapColorInteger);
 
                     //Set fill style
                     double fillOpacity = m.getFillOpacity();
-                    m.setFillStyle(fillOpacity, townMapColor);
+                    m.setFillStyle(fillOpacity, townMapColorInteger);
                 }
             }
         } catch (Exception ex) {}
