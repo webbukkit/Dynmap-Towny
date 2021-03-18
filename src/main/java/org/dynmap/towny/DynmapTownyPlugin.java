@@ -51,6 +51,7 @@ import com.palmergames.bukkit.towny.exceptions.EconomyException;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.palmergames.bukkit.util.Version;
 import com.palmergames.bukkit.TownyChat.Chat;
+import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
 
 public class DynmapTownyPlugin extends JavaPlugin {
 	
@@ -637,7 +638,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
     	if(blocks.isEmpty())
     	    return;
         /* Build popup */
-        String desc = formatInfoWindow(town, btype);
+        BuildTownMarkerDescriptionEvent event = new BuildTownMarkerDescriptionEvent(town, formatInfoWindow(town, btype));
+        Bukkit.getPluginManager().callEvent(event);
+        String desc = event.getDescription();
 
     	HashMap<String, TileFlags> blkmaps = new HashMap<String, TileFlags>();
         LinkedList<TownBlock> nodevals = new LinkedList<TownBlock>();
@@ -803,8 +806,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
                     m.setCornerLocations(x, z); /* Replace corner locations */
                     m.setLabel(name);   /* Update label */
                 }
-                m.setDescription(desc); /* Set popup */
-            
+                /* Set popup */
+                m.setDescription(desc);
                 /* Set line and fill properties */
                 String nation = NATION_NONE;
                 try {
@@ -844,7 +847,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
                         home.setLabel(name);   /* Update label */
                         home.setMarkerIcon(ico);
                     }
-                    home.setDescription(desc); /* Set popup */
+                    /* Set popup */
+                    home.setDescription(desc);
+
                     newmark.put(markid, home);
                 }
             }
