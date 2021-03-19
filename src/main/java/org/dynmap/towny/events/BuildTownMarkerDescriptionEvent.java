@@ -16,6 +16,10 @@ public class BuildTownMarkerDescriptionEvent extends Event {
        this.description = description;
     }
 
+    public String getTown() {
+        return description;
+    }
+
     public String getDescription() {
         return description;
     }
