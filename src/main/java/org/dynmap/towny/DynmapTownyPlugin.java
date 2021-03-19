@@ -55,7 +55,7 @@ import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
 
 public class DynmapTownyPlugin extends JavaPlugin {
 	
-	private static Version requiredTownyVersion = Version.fromString("0.96.6.0");
+	private static Version requiredTownyVersion = Version.fromString("0.96.7.8");
     private static Logger log;
     private static final String DEF_INFOWINDOW = "<div class=\"infowindow\"><span style=\"font-size:120%;\">%regionname% (%nation%)</span><br /> Mayor <span style=\"font-weight:bold;\">%playerowners%</span><br /> Associates <span style=\"font-weight:bold;\">%playermanagers%</span><br/>Flags<br /><span style=\"font-weight:bold;\">%flags%</span></div>";
     private static final String NATION_NONE = "_none_";
@@ -558,21 +558,21 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         //If dynamic nation colors is enabled, read the color from the nation object
         try {
-            if(dynamicNationColorsEnabled && town.hasNation()) {
-                Nation nation = town.getNation();
-
-                if(nation.getMapColorHexCode() != null) {
-                    String colorAsString = nation.getMapColorHexCode();
-                    int nationColor =  Integer.parseInt(colorAsString, 16);
+            if(dynamicNationColorsEnabled) {
+                //Get town map colour (if any)
+                String townMapColorHexCode = town.getMapColorHexCode();
+                if(townMapColorHexCode != null) {
+                    //Get colour as int
+                    int townMapColorInteger = Integer.parseInt(townMapColorHexCode, 16);
 
                     //Set stroke style
                     double strokeOpacity = m.getLineOpacity();
                     int strokeWeight = m.getLineWeight();
-                    m.setLineStyle(strokeWeight, strokeOpacity, nationColor);
+                    m.setLineStyle(strokeWeight, strokeOpacity, townMapColorInteger);
 
                     //Set fill style
                     double fillOpacity = m.getFillOpacity();
-                    m.setFillStyle(fillOpacity, nationColor);
+                    m.setFillStyle(fillOpacity, townMapColorInteger);
                 }
             }
         } catch (Exception ex) {}
@@ -984,7 +984,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
             townychat = (Chat)p;
         }
         
-		if (Version.fromString(towny.getDescription().getVersion()).compareTo(requiredTownyVersion) >= 0) {
+		if (Version.fromString(towny.getDescription().getVersion()).compareTo(requiredTownyVersion) < 0) {
 			getLogger().severe("Towny version does not meet required minimum version: " + requiredTownyVersion.toString());
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
