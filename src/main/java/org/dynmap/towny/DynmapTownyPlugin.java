@@ -568,6 +568,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
     }
 
     private MarkerIcon getMarkerIcon(Town town) {
+        if (town.isRuined())
+        	return defstyle.ruinicon;
+    	
         String id = town.getName();
         AreaStyle as = cusstyle.get(id);
         String natid = NATION_NONE;
@@ -577,9 +580,6 @@ public class DynmapTownyPlugin extends JavaPlugin {
         } catch (Exception ex) {}
         AreaStyle ns = nationstyle.get(natid);
         
-        if (town.isRuined())
-        	return defstyle.ruinicon;
-
         if(town.isCapital())
             return defstyle.getCapitalMarker(as, ns);
         else
