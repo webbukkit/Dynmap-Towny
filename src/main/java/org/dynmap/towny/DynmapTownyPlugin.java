@@ -49,6 +49,7 @@ import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.palmergames.bukkit.util.Version;
+import com.palmergames.util.TimeMgmt;
 import com.palmergames.bukkit.TownyChat.Chat;
 import org.dynmap.towny.events.BuildTownFlagsEvent;
 import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
@@ -110,6 +111,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         String capitalmarker;
         MarkerIcon homeicon;
         MarkerIcon capitalicon;
+        MarkerIcon ruinicon;
         int yc;
         boolean boost;
 
@@ -164,6 +166,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
                     capitalicon = markerapi.getMarkerIcon("king");
                 }
             }
+            ruinicon = markerapi.getMarkerIcon("warning");
         }
         
         public int getStrokeColor(AreaStyle cust, AreaStyle nat) {
@@ -497,8 +500,13 @@ public class DynmapTownyPlugin extends JavaPlugin {
         flags.add("fire: " + town.isFire());
         flags.add("nation: " + nation);
 
-        if (TownySettings.getBoolean(ConfigNodes.TOWN_RUINING_TOWN_RUINS_ENABLED))
-            flags.add("ruined: " + town.isRuined());
+        if (TownySettings.getBoolean(ConfigNodes.TOWN_RUINING_TOWN_RUINS_ENABLED)) {
+        	String ruinedString = "ruined: " + town.isRuined(); 
+            if (town.isRuined())
+            	ruinedString += " (Time left: " + TimeMgmt.getFormattedTimeValue(town.getRuinedTime()) + ")";
+
+           	flags.add(ruinedString);
+        }
 
         BuildTownFlagsEvent buildTownFlagsEvent = new BuildTownFlagsEvent(town, flags);
         Bukkit.getPluginManager().callEvent(buildTownFlagsEvent);
@@ -569,6 +577,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
         } catch (Exception ex) {}
         AreaStyle ns = nationstyle.get(natid);
         
+        if (town.isRuined())
+        	return defstyle.ruinicon;
+
         if(town.isCapital())
             return defstyle.getCapitalMarker(as, ns);
         else
@@ -922,7 +933,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 if(tb != null) {
                     Town t = tb.getTown();
                     if(t != null) {
-                        requestUpdateTownMap(t);
+                        reque)stUpdateTownMap(t);
                     }
                 }
             } catch (NotRegisteredException nrx) {
