@@ -48,8 +48,9 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.TownyWorld;
+import com.palmergames.bukkit.towny.war.common.townruin.TownRuinSettings;
+import com.palmergames.bukkit.towny.war.common.townruin.TownRuinUtil;
 import com.palmergames.bukkit.util.Version;
-import com.palmergames.util.TimeMgmt;
 import com.palmergames.bukkit.TownyChat.Chat;
 import org.dynmap.towny.events.BuildTownFlagsEvent;
 import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
@@ -503,7 +504,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         if (TownySettings.getBoolean(ConfigNodes.TOWN_RUINING_TOWN_RUINS_ENABLED)) {
         	String ruinedString = "ruined: " + town.isRuined(); 
             if (town.isRuined())
-            	ruinedString += " (Time left: " + TimeMgmt.getFormattedTimeValue(town.getRuinedTime()) + ")";
+            	ruinedString += " (Time left: " + (TownRuinSettings.getTownRuinsMaxDurationHours() - TownRuinUtil.getTimeSinceRuining(town)) + " hours)";
 
            	flags.add(ruinedString);
         }
