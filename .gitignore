@@ -2,6 +2,14 @@
 /.classpath
 /.project
 /.settings
+/.vscode
+
+# Intellij
+.idea
+*.iml
+
+#dependencies
+/deps
 
 # netbeans
 /nbproject
@@ -23,3 +31,4 @@
 
 # Mac filesystem dust
 /.DS_Store
+/Dynmap-Towny.iml

@@ -1,7 +1,8 @@
 name: Dynmap-Towny
 main: org.dynmap.towny.DynmapTownyPlugin
 version: "${project.version}"
-author: mikeprimm
+author: LlmDl
+api-version: 1.14
 depend: [ dynmap, Towny ]
 softdepend: [ TownyChat ]
 
