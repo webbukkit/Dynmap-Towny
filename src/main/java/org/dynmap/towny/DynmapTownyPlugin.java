@@ -308,9 +308,13 @@ public class DynmapTownyPlugin extends JavaPlugin {
     private class TownyUpdate implements Runnable {
         public void run() {
             if(!stop) {
-                updateTowns();
-                updateTownPlayerSets();
-                updateNationPlayerSets();
+            	if (TownyUniverse.getInstance().getDataSource() == null) {
+            		stop = true;
+            	} else {
+	                updateTowns();
+	                updateTownPlayerSets();
+	                updateNationPlayerSets();
+            	}
             }
         }
     }
