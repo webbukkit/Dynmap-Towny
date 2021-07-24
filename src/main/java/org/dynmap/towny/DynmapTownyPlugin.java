@@ -495,12 +495,15 @@ public class DynmapTownyPlugin extends JavaPlugin {
         if (TownyEconomyHandler.isActive() && TownySettings.isUsingEconomy())
         	v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
 
+        v = v.replace("%public%", town.isPublic() ? "true" : "false");
+        v = v.replace("%peaceful%", town.isNeutral() ? "true" : "false");
+        
+        
         /* Build flags */
         List<String> flags = new ArrayList<>();
         flags.add("Has Upkeep: " + town.hasUpkeep());
         flags.add("pvp: " + town.isPVP());
         flags.add("mobs: " + town.hasMobs());
-        flags.add("public: " + town.isPublic());
         flags.add("explosion: " + town.isBANG());
         flags.add("fire: " + town.isFire());
         flags.add("nation: " + nation);
