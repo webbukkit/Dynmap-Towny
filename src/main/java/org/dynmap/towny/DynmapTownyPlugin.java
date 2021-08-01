@@ -552,7 +552,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         m.setRangeY(y, y);
         m.setBoostFlag(defstyle.getBoost(as, ns));
 
-        //If dynamic nation colors is enabled, read the color from the nation object
+        //If dynamic nation colors is enabled, read the color from the nation and town objects
         try {
             if(dynamicNationColorsEnabled) {
                 // Get the town colour for the line colour.
