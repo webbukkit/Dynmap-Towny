@@ -431,7 +431,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
     private String formatInfoWindow(Town town, TownBlockType btype) {
         String v = "<div class=\"regioninfo\">"+infowindow+"</div>";
         if(btype != null)
-            v = v.replace("%regionname%", town.getName() + "(" + btype.toString() + ")");
+            v = v.replace("%regionname%", town.getName() + " (" + btype.toString() + ")");
         else
             v = v.replace("%regionname%", town.getName());
         v = v.replace("%playerowners%", town.hasMayor()?town.getMayor().getName():"");
