@@ -72,6 +72,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
     private boolean playersbytown;
     private boolean playersbynation;
     private boolean dynamicNationColorsEnabled;
+    private boolean dynamicTownColorsEnabled;
         
     FileConfiguration cfg;
     MarkerSet set;
@@ -552,33 +553,64 @@ public class DynmapTownyPlugin extends JavaPlugin {
         m.setRangeY(y, y);
         m.setBoostFlag(defstyle.getBoost(as, ns));
 
-        //If dynamic nation colors is enabled, read the color from the nation and town objects
-        try {
-            if(dynamicNationColorsEnabled) {
-                // Get the town colour for the line colour.
-                String townMapColorHexCode = town.getMapColorHexCode();
-                // Get the nation colour for the fill colour.
-                String nationMapColourHexCode = town.getNationMapColorHexCode();
-                
-                // Fall back to the town's colour for line colour if the nation returned null;
-                if (nationMapColourHexCode == null)
-                	nationMapColourHexCode = town.getMapColorHexCode();
-                
-                //Get colour as int
-                int townMapColorInteger = Integer.parseInt(townMapColorHexCode, 16);
-                int nationMapColorInteger = Integer.parseInt(nationMapColourHexCode, 16);
+        //Read dynamic colors from town/nation objects
+        if(dynamicTownColorsEnabled || dynamicNationColorsEnabled) {
+            try {
+                String colorHexCode; 
+                Integer townFillColorInteger = null;
+                Integer townBorderColorInteger = null;
 
-                //Set stroke style
-                double strokeOpacity = m.getLineOpacity();
-                int strokeWeight = m.getLineWeight();
-                m.setLineStyle(strokeWeight, strokeOpacity, nationMapColorInteger);
+                //CALCULATE FILL COLOUR
+                if (dynamicTownColorsEnabled) {
+                    //Here we know the server is using town colors. This takes top priority for fill
+                    colorHexCode = town.getMapColorHexCode();              
+                    if(!colorHexCode.isEmpty()) {
+                        //If town has a color, use it
+                        townFillColorInteger = Integer.parseInt(colorHexCode, 16);                
+                    }                
+                } else {
+                    //Here we know the server is using nation colors
+                    colorHexCode = town.getNationMapColorHexCode();              
+                    if(colorHexCode != null && !colorHexCode.isEmpty()) {
+                        //If nation has a color, use it
+                        townFillColorInteger = Integer.parseInt(colorHexCode, 16);                
+                    }                            
+                }
 
-                //Set fill style
-                double fillOpacity = m.getFillOpacity();
-                m.setFillStyle(fillOpacity, townMapColorInteger);
-            }
-        } catch (Exception ex) {}
+                //CALCULATE BORDER COLOR
+                if (dynamicNationColorsEnabled) {
+                    //Here we know the server is using nation colors. This takes top priority for border
+                    colorHexCode = town.getNationMapColorHexCode();              
+                    if(colorHexCode != null && !colorHexCode.isEmpty()) {
+                        //If nation has a color, use it
+                        townBorderColorInteger = Integer.parseInt(colorHexCode, 16);                
+                    }                                
+                } else {
+                    //Here we know the server is using town colors
+                    colorHexCode = town.getMapColorHexCode();              
+                    if(!colorHexCode.isEmpty()) {
+                        //If town has a color, use it
+                        townBorderColorInteger = Integer.parseInt(colorHexCode, 16);                
+                    }                
+                }
 
+                //SET FILL COLOR
+                if(townFillColorInteger != null) {
+                    //Set fill style
+                    double fillOpacity = m.getFillOpacity();
+                    m.setFillStyle(fillOpacity, townFillColorInteger);
+                }
+
+                //SET BORDER COLOR
+                if(townBorderColorInteger != null) {
+                    //Set stroke style
+                    double strokeOpacity = m.getLineOpacity();
+                    int strokeWeight = m.getLineWeight();
+                    m.setLineStyle(strokeWeight, strokeOpacity, townBorderColorInteger);
+                }   
+
+            } catch (Exception ex) {}
+        }
     }
 
     private MarkerIcon getMarkerIcon(Town town) {
@@ -1123,6 +1155,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         }
 
         dynamicNationColorsEnabled = cfg.getBoolean("dynamic-nation-colors", true);
+        dynamicTownColorsEnabled = cfg.getBoolean("dynamic-town-colors", true);
 
         /* Set up update job - based on periond */
         int per = cfg.getInt("update.period", 300);
