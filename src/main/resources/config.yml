@@ -28,6 +28,8 @@ visibility-by-nation: true
 
 # Use dynamic nation colors, which are set in-game by individual nations (using /n set mapcolor <color>)
 dynamic-nation-colors: true
+# Use dynamic nation colors, which are set in-game by individual nations (using /t set mapcolor <color>)
+dynamic-town-colors: true
 
 # Format for popup - substitute values for macros
 infowindow: '<div class="infowindow"><span style="font-size:120%;">%regionname% (%nation%)</span><br /> Mayor <span style="font-weight:bold;">%playerowners%</span><br /> Associates <span style="font-weight:bold;">%playermanagers%</span><br/>Flags<br /><span style="font-weight:bold;">%flags%</span></div>'
