@@ -48,8 +48,7 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownBlockType;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.TownyWorld;
-import com.palmergames.bukkit.towny.war.common.townruin.TownRuinSettings;
-import com.palmergames.bukkit.towny.war.common.townruin.TownRuinUtil;
+import com.palmergames.bukkit.towny.utils.TownRuinUtil;
 import com.palmergames.bukkit.util.Version;
 import com.palmergames.bukkit.TownyChat.Chat;
 import org.dynmap.towny.events.BuildTownFlagsEvent;
@@ -57,7 +56,7 @@ import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
 
 public class DynmapTownyPlugin extends JavaPlugin {
 	
-	private static Version requiredTownyVersion = Version.fromString("0.97.0.18");
+	private static Version requiredTownyVersion = Version.fromString("0.97.2.0");
     private static Logger log;
     private static final String DEF_INFOWINDOW = "<div class=\"infowindow\"><span style=\"font-size:120%;\">%regionname% (%nation%)</span><br /> Mayor <span style=\"font-weight:bold;\">%playerowners%</span><br /> Associates <span style=\"font-weight:bold;\">%playermanagers%</span><br/>Flags<br /><span style=\"font-weight:bold;\">%flags%</span></div>";
     private static final String NATION_NONE = "_none_";
@@ -451,8 +450,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         String dispNames = "";
         for (Resident r: town.getResidents()) {
-            @SuppressWarnings("deprecation")
-			Player p = Bukkit.getPlayer(r.getName());
+            Player p = Bukkit.getPlayer(r.getName());
             if(dispNames.length()>0) mgrs += ", ";
 
             if (p == null) {
@@ -512,7 +510,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         if (TownySettings.getBoolean(ConfigNodes.TOWN_RUINING_TOWN_RUINS_ENABLED)) {
         	String ruinedString = "ruined: " + town.isRuined(); 
             if (town.isRuined())
-            	ruinedString += " (Time left: " + (TownRuinSettings.getTownRuinsMaxDurationHours() - TownRuinUtil.getTimeSinceRuining(town)) + " hours)";
+            	ruinedString += " (Time left: " + (TownySettings.getTownRuinsMaxDurationHours() - TownRuinUtil.getTimeSinceRuining(town)) + " hours)";
 
            	flags.add(ruinedString);
         }
