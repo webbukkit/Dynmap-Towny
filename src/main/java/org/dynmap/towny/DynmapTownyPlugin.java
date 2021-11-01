@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.stream.Collectors;
 import com.palmergames.bukkit.config.ConfigNodes;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyFormatter;
@@ -435,11 +435,15 @@ public class DynmapTownyPlugin extends JavaPlugin {
         else
             v = v.replace("%regionname%", town.getName());
         v = v.replace("%playerowners%", town.hasMayor()?town.getMayor().getName():"");
-        String res = "";
-        for(Resident r : town.getResidents()) {
-        	if(res.length()>0) res += ", ";
-        	res += r.getName();
-        }
+        String[] residents = town.getResidents().stream().map(obj -> obj.getName()).collect(Collectors.toList()).toArray(new String[0]);
+		if (residents.length > 34) {
+			String[] entire = residents;
+			residents = new String[35 + 1];
+			System.arraycopy(entire, 0, residents, 0, 35);
+			residents[35] = "and more...";
+		}
+		
+        String res = String.join(", ", residents);
         v = v.replace("%playermembers%", res);
         String mgrs = "";
         for(Resident r : town.getRank("assistant")) {
