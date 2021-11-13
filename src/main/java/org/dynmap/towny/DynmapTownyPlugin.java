@@ -568,7 +568,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
                     colorHexCode = town.getMapColorHexCode();              
                     if(!colorHexCode.isEmpty()) {
                         //If town has a color, use it
-                        townFillColorInteger = Integer.parseInt(colorHexCode, 16);                
+                        townFillColorInteger = Integer.parseInt(colorHexCode, 16);
+                        townBorderColorInteger = townFillColorInteger;
                     }                
                 } else {
                     //Here we know the server is using nation colors
