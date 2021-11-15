@@ -200,6 +200,17 @@ public class DynmapTownyPlugin extends JavaPlugin {
         	else
         		return 3;
         }
+        public int getFillColor(TownBlockType btype) {
+        	if (btype == TownBlockType.COMMERCIAL)
+        		return fillcolor_shops;
+        	if (btype == TownBlockType.ARENA) 
+        		return fillcolor_arenas;
+        	if (btype == TownBlockType.EMBASSY) 
+        		return fillcolor_embassies;
+        	if (btype == TownBlockType.WILDS) 
+        		return fillcolor_wilds;
+        	return -1;
+        }
         public int getFillColor(AreaStyle cust, AreaStyle nat, TownBlockType btype) {
             if(btype == TownBlockType.COMMERCIAL) {
                 if((cust != null) && (cust.fillcolor_shops >= 0))
@@ -601,7 +612,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 if(townFillColorInteger != null) {
                     //Set fill style
                     double fillOpacity = m.getFillOpacity();
-                    m.setFillStyle(fillOpacity, townFillColorInteger);
+                    //Allow special fills for some townblock types
+                    int townblockcolor = defstyle.getFillColor(btype);
+                    m.setFillStyle(fillOpacity, townblockcolor >= 0 ? townblockcolor : townFillColorInteger);
                 }
 
                 //SET BORDER COLOR
