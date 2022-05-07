@@ -46,6 +46,10 @@
             <url>http://repo.mikeprimm.com/</url>
         </repository>
         <repository>
+            <id>glaremasters repo</id>
+            <url>https://repo.glaremasters.me/repository/towny/</url>
+        </repository>
+        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -65,9 +69,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.TownyAdvanced</groupId>
+            <groupId>com.palmergames.bukkit.towny</groupId>
             <artifactId>Towny</artifactId>
-            <version>0.97.2.0</version>
+            <version>0.98.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.TownyAdvanced</groupId>

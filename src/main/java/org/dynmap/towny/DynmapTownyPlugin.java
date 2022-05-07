@@ -57,7 +57,7 @@ import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
 
 public class DynmapTownyPlugin extends JavaPlugin {
 	
-	private static Version requiredTownyVersion = Version.fromString("0.97.2.0");
+	private static Version requiredTownyVersion = Version.fromString("0.98.1.0");
     private static Logger log;
     private static final String DEF_INFOWINDOW = "<div class=\"infowindow\"><span style=\"font-size:120%;\">%regionname% (%nation%)</span><br /> Mayor <span style=\"font-weight:bold;\">%playerowners%</span><br /> Associates <span style=\"font-weight:bold;\">%playermanagers%</span><br/>Flags<br /><span style=\"font-weight:bold;\">%flags%</span></div>";
     private static final String NATION_NONE = "_none_";
@@ -913,7 +913,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         Map<String,Marker> newmark = new HashMap<String,Marker>(); /* Build new map */
         
         /* Loop through towns */
-        List<Town> towns = TownyAPI.getInstance().getDataSource().getTowns();
+        List<Town> towns = TownyAPI.getInstance().getTowns();
         for(Town t : towns) {
     		handleTown(t, newmap, newmark, null);
     		if(show_shops) {
