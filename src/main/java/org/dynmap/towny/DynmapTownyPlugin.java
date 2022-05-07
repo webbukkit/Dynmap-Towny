@@ -50,6 +50,7 @@ import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.palmergames.bukkit.towny.utils.TownRuinUtil;
 import com.palmergames.bukkit.util.Version;
+import com.palmergames.util.StringMgmt;
 import com.palmergames.bukkit.TownyChat.Chat;
 import org.dynmap.towny.events.BuildTownFlagsEvent;
 import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
@@ -481,6 +482,8 @@ public class DynmapTownyPlugin extends JavaPlugin {
         v = v.replace("%residentcount%", town.getResidents().size() + "");
         v = v.replace("%founded%", town.getRegistered() != 0 ? TownyFormatter.registeredFormat.format(town.getRegistered()) : "Not set");
         v = v.replace("%board%", town.getBoard());
+        v = v.replace("%towntrusted%", town.getTrustedResidents().isEmpty() ? "None"
+                : StringMgmt.join(town.getTrustedResidents().stream().map(trustedRes-> trustedRes.getName()).collect(Collectors.toList()), ", "));
 
         if (TownySettings.isUsingEconomy() && TownyEconomyHandler.isActive()) {
 	        if (town.isTaxPercentage()) {
@@ -876,12 +879,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         }
         if(btype == null) {
             /* Now, add marker for home block */
-            TownBlock blk = null;
-            try {
-                blk = town.getHomeBlock();
-            } catch(Exception ex) {
-                severe("getHomeBlock exception " + ex);
-            }
+            TownBlock blk = town.getHomeBlockOrNull();
             if((blk != null) && isVisible(name, blk.getWorld().getName())) {
                 String markid = town.getName() + "__home";
                 MarkerIcon ico = getMarkerIcon(town);
