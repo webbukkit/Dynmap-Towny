@@ -57,7 +57,7 @@ import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
 
 public class DynmapTownyPlugin extends JavaPlugin {
 	
-	private static Version requiredTownyVersion = Version.fromString("0.98.1.0");
+	private static Version requiredTownyVersion = Version.fromString("0.98.4.0");
     private static Logger log;
     private static final String DEF_INFOWINDOW = "<div class=\"infowindow\"><span style=\"font-size:120%;\">%regionname% (%nation%)</span><br /> Mayor <span style=\"font-weight:bold;\">%playerowners%</span><br /> Associates <span style=\"font-weight:bold;\">%playermanagers%</span><br/>Flags<br /><span style=\"font-weight:bold;\">%flags%</span></div>";
     private static final String NATION_NONE = "_none_";
@@ -466,17 +466,9 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         String dispNames = "";
         for (Resident r: town.getResidents()) {
-            Player p = Bukkit.getPlayer(r.getName());
-            if(dispNames.length()>0) mgrs += ", ";
-
-            if (p == null) {
-                dispNames += r.getFormattedName();
-                continue;
-            }
-
-            dispNames += p.getDisplayName();
+            if(dispNames.length()>0) dispNames += ", ";
+            dispNames += r.isOnline() ? r.getPlayer().getDisplayName() : r.getFormattedName();
         }
-
         v = v.replace("%residentdisplaynames%", dispNames);
 
         v = v.replace("%residentcount%", town.getResidents().size() + "");
@@ -521,7 +513,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         flags.add("Has Upkeep: " + town.hasUpkeep());
         flags.add("pvp: " + town.isPVP());
         flags.add("mobs: " + town.hasMobs());
-        flags.add("explosion: " + town.isBANG());
+        flags.add("explosion: " + town.isExplosion());
         flags.add("fire: " + town.isFire());
         flags.add("nation: " + nation);
 
