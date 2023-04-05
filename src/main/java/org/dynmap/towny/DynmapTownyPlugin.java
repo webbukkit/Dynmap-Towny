@@ -54,6 +54,7 @@ import com.palmergames.util.StringMgmt;
 import com.palmergames.bukkit.TownyChat.Chat;
 import org.dynmap.towny.events.BuildTownFlagsEvent;
 import org.dynmap.towny.events.BuildTownMarkerDescriptionEvent;
+import org.dynmap.towny.events.TownSetMarkerIconEvent;
 import org.dynmap.towny.events.TownRenderEvent;
 
 public class DynmapTownyPlugin extends JavaPlugin {
@@ -791,6 +792,12 @@ public class DynmapTownyPlugin extends JavaPlugin {
             if((blk != null) && isVisible(name, blk.getWorld().getName())) {
                 String markid = town.getName() + "__home";
                 MarkerIcon ico = getMarkerIcon(town);
+
+                /* Fire an event allowing other plugins to alter the MarkerIcon */
+                TownSetMarkerIconEvent iconEvent = new TownSetMarkerIconEvent(town, ico);
+                Bukkit.getPluginManager().callEvent(iconEvent);
+                ico = iconEvent.getIcon();
+
                 if(ico != null) {
                     Marker home = resmark.remove(markid);
                     double xx = townblocksize*blk.getX() + (townblocksize/2);
