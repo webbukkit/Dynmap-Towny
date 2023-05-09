@@ -16,6 +16,9 @@ import com.palmergames.bukkit.config.ConfigNodes;
 import com.palmergames.bukkit.towny.TownyEconomyHandler;
 import com.palmergames.bukkit.towny.TownyFormatter;
 import com.palmergames.bukkit.towny.TownySettings;
+import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
+import com.palmergames.bukkit.towny.scheduling.impl.BukkitTaskScheduler;
+import com.palmergames.bukkit.towny.scheduling.impl.FoliaTaskScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -59,7 +62,7 @@ import org.dynmap.towny.events.TownRenderEvent;
 
 public class DynmapTownyPlugin extends JavaPlugin {
 	
-	private static Version requiredTownyVersion = Version.fromString("0.98.6.0");
+	private static final Version requiredTownyVersion = Version.fromString("0.99.0.6");
     private static Logger log;
     private static final String DEF_INFOWINDOW = "<div class=\"infowindow\"><span style=\"font-size:120%;\">%regionname% (%nation%)</span><br /> Mayor <span style=\"font-weight:bold;\">%playerowners%</span><br /> Associates <span style=\"font-weight:bold;\">%playermanagers%</span><br/>Flags<br /><span style=\"font-weight:bold;\">%flags%</span></div>";
     Plugin dynmap;
@@ -92,6 +95,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
     boolean chat_sendlogin;
     boolean chat_sendquit;
     String chatformat;
+    private final TaskScheduler scheduler;
+
+    public DynmapTownyPlugin() {
+        this.scheduler = isFoliaClassPresent() ? new FoliaTaskScheduler(this) : new BukkitTaskScheduler(this);
+    }
     
     @Override
     public void onLoad() {
@@ -1058,10 +1066,10 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         /* Set up update job - based on periond */
         int per = Math.max(15, cfg.getInt("update.period", 300));
-        updperiod = (per*20);
+        updperiod = (per*20L);
         stop = false;
 
-        getServer().getScheduler().runTaskTimerAsynchronously(this, new TownyUpdate(), 40, per);
+        scheduler.runAsyncRepeating(new TownyUpdate(), 40, per);
         
         info("version " + this.getDescription().getVersion() + " is activated");
     }
@@ -1075,4 +1083,12 @@ public class DynmapTownyPlugin extends JavaPlugin {
         stop = true;
     }
 
+    private static boolean isFoliaClassPresent() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
 }
