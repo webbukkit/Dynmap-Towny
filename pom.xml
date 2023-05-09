@@ -70,8 +70,8 @@
         </dependency>
         <dependency>
             <groupId>com.palmergames.bukkit.towny</groupId>
-            <artifactId>Towny</artifactId>
-            <version>0.98.6.0</version>
+            <artifactId>towny</artifactId>
+            <version>0.99.0.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.TownyAdvanced</groupId>

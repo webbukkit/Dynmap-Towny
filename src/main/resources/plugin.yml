@@ -5,4 +5,4 @@ author: LlmDl
 api-version: 1.14
 depend: [ dynmap, Towny ]
 softdepend: [ TownyChat ]
-
+folia-supported: true
