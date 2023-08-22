@@ -42,6 +42,7 @@ regionstyle:
   fillOpacity: 0.35
   homeicon: "blueflag"
   capitalicon: "king"
+  outposticon: "tower"
   fillColorShops: "#0000FF"
   fillColorArenas: "#FF00FF"
   fillColorEmbassies: "#00FFFF"

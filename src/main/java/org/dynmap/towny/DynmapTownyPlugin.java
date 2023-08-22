@@ -20,6 +20,7 @@ import com.palmergames.bukkit.towny.scheduling.TaskScheduler;
 import com.palmergames.bukkit.towny.scheduling.impl.BukkitTaskScheduler;
 import com.palmergames.bukkit.towny.scheduling.impl.FoliaTaskScheduler;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -118,9 +119,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
         int fillcolor_wilds;
         String homemarker;
         String capitalmarker;
+        String outpostmarker;
         MarkerIcon homeicon;
         MarkerIcon capitalicon;
         MarkerIcon ruinicon;
+        MarkerIcon outposticon;
         int yc;
         boolean boost;
 
@@ -176,6 +179,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 }
             }
             ruinicon = markerapi.getMarkerIcon("warning");
+
+			outpostmarker = cfg.getString(path + ".outposticon", "tower");
+			outposticon = markerapi.getMarkerIcon(outpostmarker);
+			if (outposticon == null)
+				outposticon = markerapi.getMarkerIcon("tower");
         }
         
         public int getStrokeColor(AreaStyle cust, AreaStyle nat) {
@@ -826,6 +834,34 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
                     newmark.put(markid, home);
                 }
+
+				if (town.hasOutpostSpawn()) {
+					MarkerIcon outpostIco = defstyle.outposticon;
+					int i = 0;
+					for (Location loc : town.getAllOutpostSpawns()) {
+						i++;
+						TownBlock tblk = TownyAPI.getInstance().getTownBlock(loc);
+						if (tblk == null)
+							continue;
+
+						double xx = townblocksize * tblk.getX() + (townblocksize / 2);
+						double zz = townblocksize * tblk.getZ() + (townblocksize / 2);
+						String outpostName = town.getName() + "_Outpost_" + i;
+						String outpostMarkerID = outpostName;
+						Marker outpostMarker = resmark.remove(outpostMarkerID);
+						if (outpostMarker == null) {
+							outpostMarker = set.createMarker(outpostMarkerID, outpostName, blk.getWorld().getName(), xx, 64, zz, outpostIco, true);
+							if (outpostMarker == null)
+								continue;
+						} else {
+							outpostMarker.setLocation(blk.getWorld().getName(), xx, 64, zz);
+							outpostMarker.setLabel(outpostName);
+							outpostMarker.setMarkerIcon(outpostIco);
+						}
+						outpostMarker.setDescription(tblk.getName() != null ? tblk.getName() : outpostName);
+						newmark.put(outpostMarkerID, outpostMarker);
+					}
+				}
             }
         }
     }
