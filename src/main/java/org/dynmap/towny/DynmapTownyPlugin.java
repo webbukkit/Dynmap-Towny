@@ -850,11 +850,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
 						String outpostMarkerID = outpostName;
 						Marker outpostMarker = resmark.remove(outpostMarkerID);
 						if (outpostMarker == null) {
-							outpostMarker = set.createMarker(outpostMarkerID, outpostName, blk.getWorld().getName(), xx, 64, zz, outpostIco, true);
+							outpostMarker = set.createMarker(outpostMarkerID, outpostName, tblk.getWorld().getName(), xx, 64, zz, outpostIco, true);
 							if (outpostMarker == null)
 								continue;
 						} else {
-							outpostMarker.setLocation(blk.getWorld().getName(), xx, 64, zz);
+							outpostMarker.setLocation(tblk.getWorld().getName(), xx, 64, zz);
 							outpostMarker.setLabel(outpostName);
 							outpostMarker.setMarkerIcon(outpostIco);
 						}
