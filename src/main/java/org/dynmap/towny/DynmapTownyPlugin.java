@@ -79,7 +79,6 @@ public class DynmapTownyPlugin extends JavaPlugin {
         
     FileConfiguration cfg;
     MarkerSet set;
-    long updperiod;
     boolean use3d;
     String infowindow;
     AreaStyle defstyle;
@@ -780,8 +779,11 @@ public class DynmapTownyPlugin extends JavaPlugin {
                 if(m == null) {
                     m = set.createAreaMarker(polyid, name, false, curworld.getName(), x, z, false);
                     if(m == null) {
-                        info("error adding area marker " + polyid);
-                        return;
+                    	m = set.findAreaMarker(polyid);
+                    	if (m == null) {
+                            info("error adding area marker " + polyid);
+                            return;
+                    	}
                     }
                 }
                 else {
@@ -1102,10 +1104,10 @@ public class DynmapTownyPlugin extends JavaPlugin {
 
         /* Set up update job - based on periond */
         int per = Math.max(15, cfg.getInt("update.period", 300));
-        updperiod = (per*20L);
+        long updperiod = (per*20L);
         stop = false;
 
-        scheduler.runAsyncRepeating(new TownyUpdate(), 40, per);
+        scheduler.runAsyncRepeating(new TownyUpdate(), 40, updperiod);
         
         info("version " + this.getDescription().getVersion() + " is activated");
     }
