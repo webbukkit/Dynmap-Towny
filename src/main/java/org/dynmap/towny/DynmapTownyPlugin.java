@@ -95,6 +95,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
     boolean chat_sendlogin;
     boolean chat_sendquit;
     String chatformat;
+    String noNationSlug;
     private final TaskScheduler scheduler;
 
     public DynmapTownyPlugin() {
@@ -429,7 +430,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
 	       	v = v.replace("%bank%", TownyEconomyHandler.getFormattedBalance(town.getAccount().getCachedBalance()));
             v = v.replace("%upkeep%", TownyEconomyHandler.getFormattedBalance(TownySettings.getTownUpkeepCost(town)));
         }
-        String nation = town.hasNation() ? town.getNationOrNull().getName() : "";
+        String nation = town.hasNation() ? town.getNationOrNull().getName() : noNationSlug;
 
         v = v.replace("%nation%", nation);
 
@@ -1034,6 +1035,7 @@ public class DynmapTownyPlugin extends JavaPlugin {
         set.setHideByDefault(cfg.getBoolean("layer.hidebydefault", false));
         use3d = cfg.getBoolean("use3dregions", false);
         infowindow = cfg.getString("infowindow", DEF_INFOWINDOW);
+        noNationSlug = cfg.getString("noNationSlug", "");
         /* See if we need to show commercial areas */
         show_shops = cfg.getBoolean("layer.showShops", false);
         show_arenas = cfg.getBoolean("layer.showArenas", false);
