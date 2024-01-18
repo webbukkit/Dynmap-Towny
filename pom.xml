@@ -5,6 +5,7 @@
     <version>1.0.0</version>
 
     <build>
+        <defaultGoal>clean package</defaultGoal>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
