@@ -1,7 +1,6 @@
-package org.dynmap.towny;
+package org.dynmap.towny.mapupdate;
 
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  * scalable flags primitive - used for keeping track of potentially huge number of tiles
